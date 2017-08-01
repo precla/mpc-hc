@@ -44,9 +44,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SysVersion.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="text.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -109,9 +106,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SysVersion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -143,6 +137,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ISOLang.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VersionHelpersInternal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

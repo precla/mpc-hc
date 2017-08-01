@@ -27,6 +27,7 @@
 #include "MediaInfo/library/Source/ThirdParty/base64/base64.h"
 #include "tinyxml2/library/tinyxml2.h"
 #include "rapidjson/include/rapidjson/document.h"
+#include <wincrypt.h>
 
 #define LOG if (AfxGetAppSettings().bEnableLogging) SUBTITLES_LOG
 #define LOG_NONE    _T("()")
@@ -74,7 +75,7 @@ void SubtitlesProviders::RegisterProviders()
 
 void OpenSubtitles::Initialize()
 {
-    xmlrpc = std::make_unique<XmlRpcClient>("http://api.opensubtitles.org/xml-rpc");
+    xmlrpc = std::make_unique<XmlRpcClient>((Url() + "/xml-rpc").c_str());
     xmlrpc->setIgnoreCertificateAuthority();
 }
 
@@ -434,7 +435,7 @@ SRESULT SubDB::Hash(SubtitlesInfo& pFileInfo)
     } else {
         CFile file;
         CFileException fileException;
-        if (file.Open(CString(pFileInfo.filePath.c_str()),
+        if (file.Open(CString(pFileInfo.filePathW.c_str()),
                       CFile::modeRead | CFile::osSequentialScan | CFile::shareDenyNone | CFile::typeBinary,
                       &fileException)) {
             file.Read(&buffer[0], PROBE_SIZE);
@@ -450,7 +451,7 @@ SRESULT SubDB::Hash(SubtitlesInfo& pFileInfo)
 SRESULT SubDB::Search(const SubtitlesInfo& pFileInfo)
 {
     SRESULT searchResult = SR_UNDEFINED;
-    std::string url(StringFormat("http://api.thesubdb.com/?action=search&hash=%s", pFileInfo.fileHash.c_str()));
+    std::string url(StringFormat("%s/?action=search&hash=%s", Url().c_str(), pFileInfo.fileHash.c_str()));
     LOG(LOG_INPUT, url.c_str());
 
     std::string data;
@@ -479,7 +480,7 @@ SRESULT SubDB::Search(const SubtitlesInfo& pFileInfo)
 
 SRESULT SubDB::Download(SubtitlesInfo& pSubtitlesInfo)
 {
-    std::string url(StringFormat("http://api.thesubdb.com/?action=download&hash=%s&language=%s", pSubtitlesInfo.id.c_str(), pSubtitlesInfo.languageCode.c_str()));
+    std::string url(StringFormat("%s/?action=download&hash=%s&language=%s", Url().c_str(), pSubtitlesInfo.id.c_str(), pSubtitlesInfo.languageCode.c_str()));
     LOG(LOG_INPUT, url.c_str());
     return DownloadInternal(url, "", pSubtitlesInfo.fileContents);
 }
@@ -487,7 +488,7 @@ SRESULT SubDB::Download(SubtitlesInfo& pSubtitlesInfo)
 SRESULT SubDB::Upload(const SubtitlesInfo& pSubtitlesInfo)
 {
 #define MULTIPART_BOUNDARY "xYzZY"
-    std::string url(StringFormat("http://api.thesubdb.com/?action=upload&hash=%s", pSubtitlesInfo.fileHash.c_str()));
+    std::string url(StringFormat("%s/?action=upload&hash=%s", Url().c_str(), pSubtitlesInfo.fileHash.c_str()));
     stringMap headers({
         { "User-Agent", UserAgent() },
         { "Content-Type", "multipart/form-data; boundary=" MULTIPART_BOUNDARY },
@@ -531,7 +532,7 @@ const std::set<std::string>& SubDB::Languages() const
                 throw LanguageDownloadException("No internet connection.");
             }
             std::string data;
-            if (DownloadInternal("http://api.thesubdb.com/?action=languages", "", data) != SR_SUCCEEDED) {
+            if (DownloadInternal(Url() + "/?action=languages", "", data) != SR_SUCCEEDED) {
                 throw LanguageDownloadException("Failed to download language list.");
             }
             for (const auto& str : StringTokenize(data, ",")) {
@@ -608,7 +609,7 @@ SRESULT podnapisi::Search(const SubtitlesInfo& pFileInfo)
         }
         search = std::regex_replace(search, std::regex(" and | *[!?&':] *", RegexFlags), " ");
 
-        std::string url("https://www.podnapisi.net/ppodnapisi/search");
+        std::string url(Url() + "/ppodnapisi/search");
         url += "?sXML=1";
         url += "&sAKA=1";
         url += (!search.empty() ? "&sK=" + UrlEncode(search.c_str()) : "");
@@ -743,7 +744,7 @@ SRESULT podnapisi::Hash(SubtitlesInfo& pFileInfo)
 
 SRESULT podnapisi::Download(SubtitlesInfo& pSubtitlesInfo)
 {
-    std::string url = StringFormat("https://www.podnapisi.net/subtitles/%s/download", pSubtitlesInfo.id.c_str());
+    std::string url = StringFormat("%s/subtitles/%s/download", Url().c_str(), pSubtitlesInfo.id.c_str());
     LOG(LOG_INPUT, url.c_str());
     return DownloadInternal(url, "", pSubtitlesInfo.fileContents);
 }
@@ -1040,7 +1041,7 @@ SRESULT Napisy24::Search(const SubtitlesInfo& pFileInfo)
         { "Content-Type", "application/x-www-form-urlencoded" }
     });
     std::string data;
-    std::string url = "http://napisy24.pl/run/CheckSubAgent.php";
+    std::string url = Url() + "/run/CheckSubAgent.php";
     std::string content = "postAction=CheckSub";
     content += "&ua=mpc-hc";
     content += "&ap=mpc-hc";
@@ -1091,7 +1092,7 @@ SRESULT Napisy24::Search(const SubtitlesInfo& pFileInfo)
         subtitleInfoMap[key] = value;
     }
 
-    subtitleInfo.url = "http://napisy24.pl/komentarze?napisId=" + subtitleInfoMap["napisId"];
+    subtitleInfo.url = Url() + "/komentarze?napisId=" + subtitleInfoMap["napisId"];
     subtitleInfo.title = subtitleInfoMap["ftitle"];
     subtitleInfo.imdbid = subtitleInfoMap["fimdb"];
 

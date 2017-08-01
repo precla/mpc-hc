@@ -468,7 +468,6 @@
 #define IDC_DSDXR                       12107
 #define IDC_DSNULL_COMP                 12108
 #define IDC_DSNULL_UNCOMP               12109
-#define IDC_DSEVR                       12110
 #define IDC_DSEVR_CUSTOM                12111
 #define IDC_DSMADVR                     12112
 #define IDC_DSSYNC                      12113
@@ -482,7 +481,6 @@
 #define IDC_DX9RESIZER_COMBO            12130
 #define IDC_DSVMR9LOADMIXER             12131
 #define IDC_DX_SURFACE                  12133
-#define IDC_DSVMR9YUVMIXER              12134
 #define IDC_BUTTON_MI                   12136
 #define IDC_MIEDIT                      12137
 #define IDC_LISTCHANNELS                12138
@@ -1571,6 +1569,9 @@
 #define IDS_PPAGEADVANCED_USE_LEGACY_TOOLBAR 57533
 #define IDS_SUBTITLE_RENDERER_ASS_FILTER 57534
 #define IDS_SUBMENU_COPYURL             57535
+#define IDS_CMD_VIEWPRESET              57536
+#define IDS_CMD_MUTE                    57537
+#define IDS_CMD_VOLUME                  57538
 
 // Next default values for new objects
 // 

@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: MPC-HC\n"
-"POT-Creation-Date: 2017-06-03 12:18:37+0000\n"
-"PO-Revision-Date: 2017-06-03 15:00+0000\n"
-"Last-Translator: JellyFrog\n"
+"POT-Creation-Date: 2017-07-30 18:43:01+0000\n"
+"PO-Revision-Date: 2017-07-30 21:12+0000\n"
+"Last-Translator: kasper93\n"
 "Language-Team: Malay (Malaysia) (http://www.transifex.com/mpc-hc/mpc-hc/language/ms_MY/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -609,8 +609,8 @@ msgid "Clip"
 msgstr "Klip"
 
 msgctxt "IDC_DSSYSDEF"
-msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason. On Windown XP this is the same as VMR-7 (windowed)."
-msgstr "Penapis penerap video lalai untuk DirectShow. Lain-lain akan jatuh-balik yang ini bila ia tidak dapat dimuatkan atas beberapa sebab. Pada Windows XP ini adalah serupa dengan VMR-7 (bertetingkap)."
+msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason."
+msgstr ""
 
 msgctxt "IDC_DSOLD"
 msgid "This is the default renderer of Windows 9x/me/2k. Depending on the visibility of the video window and your video card's abilities, it will switch between GDI, DirectDraw, Overlay rendering modes dynamically."
@@ -625,8 +625,8 @@ msgid "Only available if you have DirectX 9 installed. Very stable but it will n
 msgstr "Hanya tersedia jika anda mempunyai DirectX 9 dipasang. Sangat stabil tetapi ia tidak sesekali guna penerapan Tindihan Atas dan disebabkan ini ia menjadi lebih lembab berbanding pengadun Tindihan Atas."
 
 msgctxt "IDC_DSVMR9REN"
-msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended. Recommended for Windows XP."
-msgstr "Sama seperti VMR-9 (bertetingkap), tetapi dengan pemalam Allocator-Presenter MPC-HC untuk sarikata. Pencerminan video Tindihan TIDAK AKAN berfungsi. Ruang warna desktop \"True Color\" disarankan. Disarankan juga untuk Windows XP."
+msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended."
+msgstr ""
 
 msgctxt "IDC_DSDXR"
 msgid "Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
@@ -640,13 +640,9 @@ msgctxt "IDC_DSNULL_UNCOMP"
 msgid "Same as the normal Null renderer, but this will only connect to uncompressed types."
 msgstr "Sama seperti penerap Nol biasa, tetapi ia hanya sambung kr jenis tak termampat."
 
-msgctxt "IDC_DSEVR"
-msgid "Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
-msgstr "Hanya tersedia pada Vista atau yang terbaharu atau pada XP sekurang-kurangnya .NET Framework 3.5 dipasang."
-
 msgctxt "IDC_DSEVR_CUSTOM"
-msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended for Windows Vista or later."
-msgstr "Sama seperti EVR, tetapi dengan Allocator-Presenter bagi MPC-HC untuk sarikata dan pasca-pemprosesan. Disarankan untuk WIndows Vista atau yang terkini."
+msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended."
+msgstr ""
 
 msgctxt "IDC_DSMADVR"
 msgid "High-quality renderer, requires a GPU that supports D3D9 or later."
@@ -799,10 +795,6 @@ msgstr "Jika tiada sokongan Pelorek Piksel 2.0, dwi-linear mudah akan diguna sec
 msgctxt "IDC_DSVMR9LOADMIXER"
 msgid "Puts VMR-9 (renderless) into mixer mode, this means most of the controls on its property page will work and it will use a separate worker thread to renderer frames."
 msgstr "Letak VMR-9 (tak diterap) ke dalam mod pengadun, ini bermaksud kebanyakan kawalan pada halaman sifatnya akan berfungsi dan ia akan guna bebenang pekerja berasingan ke bingkai penerap."
-
-msgctxt "IDC_DSVMR9YUVMIXER"
-msgid "Improves performance at the cost of some compatibility of the renderer."
-msgstr "Tingkatkan prestasi dengan mengorbankan keserasian penerap."
 
 msgctxt "IDC_FULLSCREEN_MONITOR_CHECK"
 msgid "Reduces tearing but prevents the toolbar from being shown."
@@ -1041,11 +1033,11 @@ msgid "Scale to 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 msgstr "Skala ke TV 16:9,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_WIDESCREEN"
-msgid "Zoom To Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Zum Ke Skrin Lebar,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_ULTRAWIDE"
-msgid "Zoom To Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Zum Ke Skrin Lebar-Ultra,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_PLAYLIST_HIDEFS"
@@ -3844,9 +3836,17 @@ msgctxt "IDS_CMD_PLAYNEXT"
 msgid "/playnext\t\tOpen next file in the folder after playback"
 msgstr "/playnext\t\tBuka fail berikutnya dalam folder selepas main balik"
 
+msgctxt "IDS_CMD_MUTE"
+msgid "/mute\tMute the audio"
+msgstr ""
+
 msgctxt "IDS_CMD_FULLSCREEN"
 msgid "/fullscreen\tStart in fullscreen mode"
 msgstr "/fullscreen\tMula dalam mod skrin-penuh"
+
+msgctxt "IDS_CMD_VIEWPRESET"
+msgid "/viewpreset N\tStart with specific preset,\n\t\twhere N is either \"1\" Minimal, \"2\" Compact or \"3\" Normal"
+msgstr ""
 
 msgctxt "IDS_CMD_MINIMIZED"
 msgid "/minimized\tStart in minimized mode"
@@ -3863,6 +3863,10 @@ msgstr "/add\t\tTambah \"pathname\" ke senarai main, boleh digandingkan dengan /
 msgctxt "IDS_CMD_RANDOMIZE"
 msgid "/randomize\tRandomize the playlist"
 msgstr "/randomize\tRawakkan senarai main"
+
+msgctxt "IDS_CMD_VOLUME"
+msgid "/volume N\tSet Volume, where N is a range from 0 to 100"
+msgstr ""
 
 msgctxt "IDS_CMD_REGVID"
 msgid "/regvid\t\tCreate file associations for video files"

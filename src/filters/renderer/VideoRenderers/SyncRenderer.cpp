@@ -29,6 +29,8 @@
 #include <strsafe.h> // Required in CGenlock
 #include <videoacc.h>
 #include <d3d9.h>
+#include <d3d10.h>
+#include <dxgi.h>
 #include <d3dx9.h>
 #include <vmr9.h>
 #include <evr.h>
@@ -41,7 +43,6 @@
 #include "IPinHook.h"
 #include "PixelShaderCompiler.h"
 #include "FocusThread.h"
-#include "../../../DSUtil/SysVersion.h"
 #include "../../../DSUtil/vd.h"
 #include <mpc-hc_config.h>
 
@@ -70,6 +71,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString& _Error)
     , m_pDwmEnableComposition(nullptr)
     , m_hD3D9(nullptr)
     , m_pDirect3DCreate9Ex(nullptr)
+    , m_pDirect3DCreate9(nullptr)
     , m_pOuterEVR(nullptr)
     , m_SurfaceType(D3DFMT_UNKNOWN)
     , m_BackbufferType(D3DFMT_UNKNOWN)
@@ -170,10 +172,13 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString& _Error)
     }
 
     m_hD3D9 = LoadLibrary(L"d3d9.dll");
-#ifndef DISABLE_USING_D3D9EX
     if (m_hD3D9) {
+        (FARPROC&)m_pDirect3DCreate9 = GetProcAddress(m_hD3D9, "Direct3DCreate9");
+#ifndef DISABLE_USING_D3D9EX
         (FARPROC&)m_pDirect3DCreate9Ex = GetProcAddress(m_hD3D9, "Direct3DCreate9Ex");
+#endif
     }
+#ifndef DISABLE_USING_D3D9EX
     if (m_pDirect3DCreate9Ex) {
         TRACE(_T("m_pDirect3DCreate9Ex\n"));
         m_pDirect3DCreate9Ex(D3D_SDK_VERSION, &m_pD3DEx);
@@ -184,9 +189,10 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString& _Error)
 #endif
 
     if (!m_pD3DEx) {
-        m_pD3D.Attach(Direct3DCreate9(D3D_SDK_VERSION));
+        ASSERT(m_pDirect3DCreate9);
+        m_pD3D.Attach(m_pDirect3DCreate9(D3D_SDK_VERSION));
         if (!m_pD3D) {
-            m_pD3D.Attach(Direct3DCreate9(D3D9b_SDK_VERSION));
+            m_pD3D.Attach(m_pDirect3DCreate9(D3D9b_SDK_VERSION));
         }
         if (m_pD3D) {
             TRACE(_T("m_pDirect3DCreate9\n"));
@@ -1949,8 +1955,7 @@ void CBaseAP::InitStats()
             ASSERT(FALSE);
         }
         m_pD3DXCreateFont(m_pD3DDev, newHeight, 0, newHeight < BOLD_THRESHOLD ? FW_NORMAL : FW_BOLD,
-                          0, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-                          SysVersion::IsXPOrLater() ? CLEARTYPE_NATURAL_QUALITY : ANTIALIASED_QUALITY,
+                          0, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLEARTYPE_NATURAL_QUALITY,
                           FIXED_PITCH | FF_DONTCARE, L"Lucida Console", &m_pFont);
         currentHeight = newHeight;
     }

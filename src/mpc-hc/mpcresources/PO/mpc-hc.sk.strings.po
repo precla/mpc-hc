@@ -7,9 +7,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: MPC-HC\n"
-"POT-Creation-Date: 2017-06-03 12:18:37+0000\n"
-"PO-Revision-Date: 2017-06-10 20:04+0000\n"
-"Last-Translator: Marián Hikaník <podnety@mojepreklady.net>\n"
+"POT-Creation-Date: 2017-07-30 18:43:01+0000\n"
+"PO-Revision-Date: 2017-07-30 21:12+0000\n"
+"Last-Translator: kasper93\n"
 "Language-Team: Slovak (http://www.transifex.com/mpc-hc/mpc-hc/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -610,8 +610,8 @@ msgid "Clip"
 msgstr "Vystrihnúť"
 
 msgctxt "IDC_DSSYSDEF"
-msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason. On Windown XP this is the same as VMR-7 (windowed)."
-msgstr "Predvolený filter pre vykresľovanie videa pri použití DirectShow. V systémoch Windows XP je táto možnosť rovnaká ako VMR-7 (s vykresľovaním v okne)."
+msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason."
+msgstr ""
 
 msgctxt "IDC_DSOLD"
 msgid "This is the default renderer of Windows 9x/me/2k. Depending on the visibility of the video window and your video card's abilities, it will switch between GDI, DirectDraw, Overlay rendering modes dynamically."
@@ -626,8 +626,8 @@ msgid "Only available if you have DirectX 9 installed. Very stable but it will n
 msgstr "Dostupné, len ak je nainštalovaný DirectX 9. Veľmi stabilné, ale nikdy sa nebude používať vykresľovanie s prekrývaním a preto môže byť tento spôsob pomalší, ako Overlay Mixer."
 
 msgctxt "IDC_DSVMR9REN"
-msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended. Recommended for Windows XP."
-msgstr "Rovnaké ako VMR-9 (v okne), ale použije sa aj modul Allocator-Presenter, pre podporu titulkovania. Zrkadlenie videa s prekrytím MÔŽE fungovať. Odporúčame nastaviť farby na hodnotu \"True Color\". Odporúča sa pre Windows XP."
+msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended."
+msgstr ""
 
 msgctxt "IDC_DSDXR"
 msgid "Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
@@ -641,13 +641,9 @@ msgctxt "IDC_DSNULL_UNCOMP"
 msgid "Same as the normal Null renderer, but this will only connect to uncompressed types."
 msgstr "Rovnaké ako voľba Null renderer, ale pripájať sa dajú iba nekomprimované typy."
 
-msgctxt "IDC_DSEVR"
-msgid "Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
-msgstr "Dostupné len v systéme Vista alebo novšom alebo na systéme XP s nainštalovaným prostredím .NET Framework 3.5."
-
 msgctxt "IDC_DSEVR_CUSTOM"
-msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended for Windows Vista or later."
-msgstr "Rovnaké ako EVR, ale so súčasťou Allocator-Presenter MPC-HC pre titulkovanie a dodatočné úpravy. Odporúča sa pre Windows Vista alebo novší."
+msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended."
+msgstr ""
 
 msgctxt "IDC_DSMADVR"
 msgid "High-quality renderer, requires a GPU that supports D3D9 or later."
@@ -800,10 +796,6 @@ msgstr "Ak karta nepodporuje Pixel Shader 2.0, automaticky sa aktivuje jednoduch
 msgctxt "IDC_DSVMR9LOADMIXER"
 msgid "Puts VMR-9 (renderless) into mixer mode, this means most of the controls on its property page will work and it will use a separate worker thread to renderer frames."
 msgstr "Nastaví VMR-9 (bez vykreslenia) na mixovací režim, v ktorom funguje väčšina ovládacích prvkov ale na vykresľovanie snímok sa bude používať zvláštne vlákno."
-
-msgctxt "IDC_DSVMR9YUVMIXER"
-msgid "Improves performance at the cost of some compatibility of the renderer."
-msgstr "Zlepšuje výkon na úkor kompatibility vykresľovača."
 
 msgctxt "IDC_FULLSCREEN_MONITOR_CHECK"
 msgid "Reduces tearing but prevents the toolbar from being shown."
@@ -1042,11 +1034,11 @@ msgid "Scale to 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 msgstr "Prepnúť na stranový pomer 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_WIDESCREEN"
-msgid "Zoom To Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Priblížiť na šírku obrazovky,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_ULTRAWIDE"
-msgid "Zoom To Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Priblížiť na šírku obrazovky - ultra,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_PLAYLIST_HIDEFS"
@@ -3845,9 +3837,17 @@ msgctxt "IDS_CMD_PLAYNEXT"
 msgid "/playnext\t\tOpen next file in the folder after playback"
 msgstr "/playnext\t\tPo prehraní otvoriť ďalší súbor v priečinku"
 
+msgctxt "IDS_CMD_MUTE"
+msgid "/mute\tMute the audio"
+msgstr ""
+
 msgctxt "IDS_CMD_FULLSCREEN"
 msgid "/fullscreen\tStart in fullscreen mode"
 msgstr "/fullscreen\tSpustiť v režime na celú obrazovku"
+
+msgctxt "IDS_CMD_VIEWPRESET"
+msgid "/viewpreset N\tStart with specific preset,\n\t\twhere N is either \"1\" Minimal, \"2\" Compact or \"3\" Normal"
+msgstr ""
 
 msgctxt "IDS_CMD_MINIMIZED"
 msgid "/minimized\tStart in minimized mode"
@@ -3864,6 +3864,10 @@ msgstr "/add\t\tPridať \"cestu\" do playlistu, možno kombinovať s prepínačm
 msgctxt "IDS_CMD_RANDOMIZE"
 msgid "/randomize\tRandomize the playlist"
 msgstr "/randomize\tZapnúť náhodné prehrávanie v playliste"
+
+msgctxt "IDS_CMD_VOLUME"
+msgid "/volume N\tSet Volume, where N is a range from 0 to 100"
+msgstr ""
 
 msgctxt "IDS_CMD_REGVID"
 msgid "/regvid\t\tCreate file associations for video files"

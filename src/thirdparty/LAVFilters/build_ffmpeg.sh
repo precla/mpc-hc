@@ -3,7 +3,11 @@
 echo "$(pwd)" | grep -q '[[:blank:]]' &&
   echo "Out of tree builds are impossible with whitespace in source path." && exit 1
 
-bin_folder=bin
+if [ "${4}" == "VS2015" ]; then
+  bin_folder=bin15
+else
+  bin_folder=bin
+fi
 
 if [ "${1}" == "x64" ]; then
   arch=x86_64
@@ -75,6 +79,9 @@ configure() {
     --enable-hwaccel=wmv3_dxva2     \
     --enable-hwaccel=mpeg2_dxva2    \
     --enable-hwaccel=vp9_dxva2      \
+    --disable-cuda                  \
+    --disable-cuvid                 \
+    --disable-nvenc                 \
     --enable-libspeex               \
     --enable-libopencore-amrnb      \
     --enable-libopencore-amrwb      \
@@ -91,7 +98,7 @@ configure() {
     --build-suffix=-lav             \
     --arch=${arch}"
 
-  EXTRA_CFLAGS="-fno-tree-vectorize -D_WIN32_WINNT=0x0502 -DWINVER=0x0502 -I../../../thirdparty/include"
+  EXTRA_CFLAGS="-fno-tree-vectorize -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 -I../../../thirdparty/include"
   EXTRA_LDFLAGS=""
   if [ "${arch}" == "x86_64" ]; then
     OPTIONS="${OPTIONS} --enable-cross-compile --cross-prefix=${cross_prefix} --target-os=mingw32 --pkg-config=pkg-config"
@@ -115,18 +122,20 @@ build() {
 configureAndBuild() {
   cd ${FFMPEG_BUILD_PATH}
   ## Don't run configure again if it was previously run
-  if [ ../../../ffmpeg/configure -ot config.mak ] &&
-     [ ../../../../build_ffmpeg.sh -ot config.mak ]; then
+  if [ ../../../ffmpeg/configure -ot ffbuild/config.mak ] &&
+     [ ../../../../build_ffmpeg.sh -ot ffbuild/config.mak ]; then
     echo Skipping configure...
   else
     echo Configuring...
 
+    ## In case of out-of-tree build this directory is created too late
+    mkdir -p ffbuild
     ## run configure, redirect to file because of a msys bug
-    configure > config.out 2>&1
+    configure > ffbuild/config.out 2>&1
     CONFIGRETVAL=$?
 
     ## show configure output
-    cat config.out
+    cat ffbuild/config.out
   fi
 
   ## Only if configure succeeded, actually build

@@ -29,6 +29,7 @@
 #endif
 
 ; If you want to compile the 64-bit version define "x64build" (uncomment the define below or use build.bat)
+;#define VS2015
 ;#define x64Build
 ;#define MPCHC_LITE
 
@@ -60,7 +61,11 @@
 #define app_vername     = app_name + " " + app_ver
 #define quick_launch    "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
 
-#define base_bindir     = "..\bin"
+#if defined(VS2015)
+  #define base_bindir   = "..\bin15"
+#else
+  #define base_bindir   = "..\bin"
+#endif
 
 #ifdef x64Build
   #define bindir        = AddBackslash(base_bindir) + "mpc-hc_x64"
@@ -92,6 +97,10 @@
   #else
     #define OutFilename  = OutFilename + ".en"
   #endif
+#endif
+
+#if defined(VS2015)
+  #define OutFilename    = OutFilename + ".VS2015"
 #endif
 
 #if MPC_NIGHTLY_RELEASE
@@ -149,7 +158,7 @@ AllowNoIcons              = yes
 ShowTasksTreeLines        = yes
 DisableDirPage            = auto
 DisableProgramGroupPage   = auto
-MinVersion                = 5.1sp3
+MinVersion                = 6.0
 CloseApplications         = true
 #ifexist "..\signinfo.txt"
 SignTool                  = MySignTool
@@ -242,7 +251,7 @@ Source: {#bindir}\{#lavfiltersdir}\*.dll;       DestDir: {app}\{#lavfiltersdir};
 Source: {#bindir}\{#lavfiltersdir}\*.ax;        DestDir: {app}\{#lavfiltersdir}; Components: main; Flags: ignoreversion
 Source: {#bindir}\{#lavfiltersdir}\*.manifest;  DestDir: {app}\{#lavfiltersdir}; Components: main; Flags: ignoreversion
 #endif
-Source: {#bindir}\D3DCompiler_{#MPC_DX_SDK_NUMBER}.dll; DestDir: {app}; Components: main; Flags: ignoreversion
+Source: {#bindir}\d3dcompiler_{#MPC_D3D_COMPILER_VERSION}.dll; DestDir: {app}; Components: main; Flags: ignoreversion
 Source: {#bindir}\d3dx9_{#MPC_DX_SDK_NUMBER}.dll;       DestDir: {app}; Components: main; Flags: ignoreversion
 Source: {#bindir}\mpciconlib.dll;               DestDir: {app}; Components: mpciconlib;   Flags: ignoreversion
 Source: {#bindir}\{#mpchc_exe};                 DestDir: {app}; Components: main;         Flags: ignoreversion
@@ -252,10 +261,10 @@ Source: ..\docs\Changelog.txt;                  DestDir: {app}; Components: main
 Source: ..\docs\Readme.txt;                     DestDir: {app}; Components: main;         Flags: ignoreversion
 Source: ..\src\mpc-hc\res\shaders\external\*.hlsl; DestDir: {app}\Shaders; Components: main; Flags: ignoreversion
 #ifexist AddBackslash(crashreporter_dir) + "crashrpt.dll"
+Source: {#crashreporter_dir}\CrashReporterDialog.dll; DestDir: {app}\CrashReporter; Components: main; Flags: ignoreversion
 Source: {#crashreporter_dir}\crashrpt.dll;            DestDir: {app}\CrashReporter; Components: main; Flags: ignoreversion
 Source: {#crashreporter_dir}\dbghelp.dll;             DestDir: {app}\CrashReporter; Components: main; Flags: ignoreversion
 Source: {#crashreporter_dir}\sendrpt.exe;             DestDir: {app}\CrashReporter; Components: main; Flags: ignoreversion
-Source: {#crashreporter_dir}\CrashReporterDialog.dll; DestDir: {app}\CrashReporter; Components: main; Flags: ignoreversion
 #endif
 
 
@@ -362,7 +371,7 @@ Type: files; Name: {app}\Lang\mpcresources.ua.dll
 
 
 [Code]
-#if defined(sse_required) || defined(sse2_required)
+#if defined(sse2_required)
 function IsProcessorFeaturePresent(Feature: Integer): Boolean;
 external 'IsProcessorFeaturePresent@kernel32.dll stdcall';
 #endif
@@ -386,14 +395,7 @@ begin
 end;
 
 
-#if defined(sse_required)
-function Is_SSE_Supported(): Boolean;
-begin
-  // PF_XMMI_INSTRUCTIONS_AVAILABLE
-  Result := IsProcessorFeaturePresent(6);
-end;
-
-#elif defined(sse2_required)
+#if defined(sse2_required)
 
 function Is_SSE2_Supported(): Boolean;
 begin

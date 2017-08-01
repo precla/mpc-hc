@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -28,7 +28,6 @@
 #include "../../../SubPic/SubPicQueueImpl.h"
 #include "IPinHook.h"
 #include "FocusThread.h"
-#include "../../../DSUtil/SysVersion.h"
 #include "../../../DSUtil/vd.h"
 #include <mpc-hc_config.h>
 
@@ -69,6 +68,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
     , m_pDwmIsCompositionEnabled(nullptr)
     , m_pDwmEnableComposition(nullptr)
     , m_pDirect3DCreate9Ex(nullptr)
+    , m_pDirect3DCreate9(nullptr)
     , m_pDirectDraw(nullptr)
     , m_LastAdapterCheck(0)
     , m_nTearingPos(0)
@@ -181,11 +181,12 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
     }
 
     m_hD3D9 = LoadLibrary(L"d3d9.dll");
-#ifndef DISABLE_USING_D3D9EX
     if (m_hD3D9) {
+        (FARPROC&)m_pDirect3DCreate9 = GetProcAddress(m_hD3D9, "Direct3DCreate9");
+#ifndef DISABLE_USING_D3D9EX
         (FARPROC&)m_pDirect3DCreate9Ex = GetProcAddress(m_hD3D9, "Direct3DCreate9Ex");
-    }
 #endif
+    }
 
     if (m_pDirect3DCreate9Ex) {
         m_pDirect3DCreate9Ex(D3D_SDK_VERSION, &m_pD3DEx);
@@ -194,9 +195,10 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
         }
     }
     if (!m_pD3DEx) {
-        m_pD3D.Attach(Direct3DCreate9(D3D_SDK_VERSION));
+        ASSERT(m_pDirect3DCreate9);
+        m_pD3D.Attach(m_pDirect3DCreate9(D3D_SDK_VERSION));
         if (!m_pD3D) {
-            m_pD3D.Attach(Direct3DCreate9(D3D9b_SDK_VERSION));
+            m_pD3D.Attach(m_pDirect3DCreate9(D3D9b_SDK_VERSION));
         }
     } else {
         m_pD3D = m_pD3DEx;
@@ -1760,8 +1762,7 @@ void CDX9AllocatorPresenter::InitStats()
             ASSERT(FALSE);
         }
         m_pD3DXCreateFont(m_pD3DDev, newHeight, 0, newHeight < BOLD_THRESHOLD ? FW_NORMAL : FW_BOLD,
-                          0, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-                          SysVersion::IsXPOrLater() ? CLEARTYPE_NATURAL_QUALITY : ANTIALIASED_QUALITY,
+                          0, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLEARTYPE_NATURAL_QUALITY,
                           FIXED_PITCH | FF_DONTCARE, L"Lucida Console", &m_pFont);
         currentHeight = newHeight;
     }

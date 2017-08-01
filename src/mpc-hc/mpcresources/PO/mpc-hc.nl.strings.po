@@ -9,6 +9,7 @@
 # DennisW, 2014,2016
 # hendrickbert <hendrickbert@gmail.com>, 2015
 # B512, 2015
+# Madada Madada <madada@mailismagic.com>, 2017
 # Marco Brohet <therbom@gmail.com>, 2015
 # mark van tilburg <markvantilburg@gmail.com>, 2016
 # Peter Pul, 2015
@@ -18,9 +19,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: MPC-HC\n"
-"POT-Creation-Date: 2017-06-03 12:18:37+0000\n"
-"PO-Revision-Date: 2017-06-03 15:00+0000\n"
-"Last-Translator: JellyFrog\n"
+"POT-Creation-Date: 2017-07-30 18:43:01+0000\n"
+"PO-Revision-Date: 2017-07-30 21:12+0000\n"
+"Last-Translator: kasper93\n"
 "Language-Team: Dutch (http://www.transifex.com/mpc-hc/mpc-hc/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -621,8 +622,8 @@ msgid "Clip"
 msgstr "Fragment"
 
 msgctxt "IDC_DSSYSDEF"
-msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason. On Windown XP this is the same as VMR-7 (windowed)."
-msgstr "Standaard video opbouw filter voor DirectShow. Alle anderen zullen op deze terugvallen, als ze niet geladen kunnen worden. In Window XP is dit hetzelfde als VMR-7 (venster)."
+msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason."
+msgstr ""
 
 msgctxt "IDC_DSOLD"
 msgid "This is the default renderer of Windows 9x/me/2k. Depending on the visibility of the video window and your video card's abilities, it will switch between GDI, DirectDraw, Overlay rendering modes dynamically."
@@ -637,8 +638,8 @@ msgid "Only available if you have DirectX 9 installed. Very stable but it will n
 msgstr "Alléén beschikbaar als DirectX 9 is geïnstallleerd. Zeer stabiel, maar het zal nooit \"overlay opbouwen\" gebruiken en hierdoor kan het een beetje trager zijn dan \"overlay mixen\"."
 
 msgctxt "IDC_DSVMR9REN"
-msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended. Recommended for Windows XP."
-msgstr "Hetzelfde als VMR-9 (venster), maar met de Allocator-Presenter plugin van MPC-HC voor ondertiteling. Overlay video mirroring KAN werken. De kleurkwaliteit van het bureaublad kan het beste 'True Color' zijn. Aangeraden in Windows XP."
+msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended."
+msgstr ""
 
 msgctxt "IDC_DSDXR"
 msgid "Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
@@ -652,13 +653,9 @@ msgctxt "IDC_DSNULL_UNCOMP"
 msgid "Same as the normal Null renderer, but this will only connect to uncompressed types."
 msgstr "Hetzelfde als de normale Null opbouwer, maar deze zal alleen verbinding maken met ongecomprimeerde typen."
 
-msgctxt "IDC_DSEVR"
-msgid "Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
-msgstr "Alleen beschikbaar op Vista of later, of op XP met minstens .NET Framework 3.5 geïnstalleerd."
-
 msgctxt "IDC_DSEVR_CUSTOM"
-msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended for Windows Vista or later."
-msgstr "Zelfde als de EVR, maar met de Allocator-Presenter van MPC-HC voor ondertiteling and postprocessing. Aanbevolen voor Windows Vista of later."
+msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended."
+msgstr ""
 
 msgctxt "IDC_DSMADVR"
 msgid "High-quality renderer, requires a GPU that supports D3D9 or later."
@@ -811,10 +808,6 @@ msgstr "Als er geen pixel shader 2.0 ondersteuning is, zal automatisch simpel bi
 msgctxt "IDC_DSVMR9LOADMIXER"
 msgid "Puts VMR-9 (renderless) into mixer mode, this means most of the controls on its property page will work and it will use a separate worker thread to renderer frames."
 msgstr "Zet VMR-9 (opbouwloos) in de mix modus. Dit betekent dat bij eigenschappen de meeste bedieningselementen zullen werken en een in aparte taak gebruikt zal worden om beelden op te bouwen."
-
-msgctxt "IDC_DSVMR9YUVMIXER"
-msgid "Improves performance at the cost of some compatibility of the renderer."
-msgstr "Verbeter prestatie ten koste van de compatibiliteit van de opbouwer."
 
 msgctxt "IDC_FULLSCREEN_MONITOR_CHECK"
 msgid "Reduces tearing but prevents the toolbar from being shown."
@@ -1053,11 +1046,11 @@ msgid "Scale to 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 msgstr "Schaal naar 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_WIDESCREEN"
-msgid "Zoom To Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Zoom naar breedbeeld,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_ULTRAWIDE"
-msgid "Zoom To Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Zoom naar ultra breedbeeld,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_PLAYLIST_HIDEFS"
@@ -3856,9 +3849,17 @@ msgctxt "IDS_CMD_PLAYNEXT"
 msgid "/playnext\t\tOpen next file in the folder after playback"
 msgstr "/playnext\t\tVolgend bestaand open na afspelen"
 
+msgctxt "IDS_CMD_MUTE"
+msgid "/mute\tMute the audio"
+msgstr ""
+
 msgctxt "IDS_CMD_FULLSCREEN"
 msgid "/fullscreen\tStart in fullscreen mode"
 msgstr "/fullscreen\tStarten in volledig scherm"
+
+msgctxt "IDS_CMD_VIEWPRESET"
+msgid "/viewpreset N\tStart with specific preset,\n\t\twhere N is either \"1\" Minimal, \"2\" Compact or \"3\" Normal"
+msgstr ""
 
 msgctxt "IDS_CMD_MINIMIZED"
 msgid "/minimized\tStart in minimized mode"
@@ -3875,6 +3876,10 @@ msgstr "/add\t\tVoeg \"pathname\" toe aan playlist, kan gecombineerd worden met 
 msgctxt "IDS_CMD_RANDOMIZE"
 msgid "/randomize\tRandomize the playlist"
 msgstr "/randomize\tRandomizeer de speellijst"
+
+msgctxt "IDS_CMD_VOLUME"
+msgid "/volume N\tSet Volume, where N is a range from 0 to 100"
+msgstr ""
 
 msgctxt "IDS_CMD_REGVID"
 msgid "/regvid\t\tCreate file associations for video files"
@@ -3978,5 +3983,5 @@ msgstr "Gebruik de veroude werkbalk in plaats van de niewe vectorized werkbalk"
 
 msgctxt "IDS_SUBMENU_COPYURL"
 msgid "Copy URL"
-msgstr ""
+msgstr "Kopieer URL"
 

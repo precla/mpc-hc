@@ -2,7 +2,7 @@
 # Copyright (C) 2002 - 2017 see Authors.txt
 # This file is distributed under the same license as the MPC-HC package.
 # Translators:
-# schop <aprcel00@fesb.hr>, 2014-2016
+# schop <aprcel00@fesb.hr>, 2014-2017
 # iivana24 <iivana24@gmail.com>, 2014
 # streger <stjepan.treger@gmail.com>, 2014-2016
 # Goran Džaferi <the.vbm@gmail.com>, 2014
@@ -11,9 +11,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: MPC-HC\n"
-"POT-Creation-Date: 2017-06-03 12:18:37+0000\n"
-"PO-Revision-Date: 2017-06-03 15:00+0000\n"
-"Last-Translator: JellyFrog\n"
+"POT-Creation-Date: 2017-07-30 18:43:01+0000\n"
+"PO-Revision-Date: 2017-07-30 21:11+0000\n"
+"Last-Translator: kasper93\n"
 "Language-Team: Croatian (http://www.transifex.com/mpc-hc/mpc-hc/language/hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -614,8 +614,8 @@ msgid "Clip"
 msgstr "Isječak"
 
 msgctxt "IDC_DSSYSDEF"
-msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason. On Windown XP this is the same as VMR-7 (windowed)."
-msgstr "Zadani video filtri prikazivanja za DirectShow. Ostali video prikazivači, ako se ne mogu učitati, će biti postavljeni na ovaj. Na Windows XP je ovo ekvivalent VMR-7 (u prozoru)."
+msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason."
+msgstr "Zadani video filtar za DirectShow. U slučaju da se ostali ne mogu učitati, biti će podešeni na ovaj."
 
 msgctxt "IDC_DSOLD"
 msgid "This is the default renderer of Windows 9x/me/2k. Depending on the visibility of the video window and your video card's abilities, it will switch between GDI, DirectDraw, Overlay rendering modes dynamically."
@@ -630,8 +630,8 @@ msgid "Only available if you have DirectX 9 installed. Very stable but it will n
 msgstr "Dostupno samo ako imate DirectX 9 instaliran. Vrlo stabilno ali nikada neće koristiti prikaz u gornjem sloju i zbog toga može biti sporiji nego Overlay mikser."
 
 msgctxt "IDC_DSVMR9REN"
-msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended. Recommended for Windows XP."
-msgstr "Isti kao VMR-9 (u prozoru) ali sa Allocator-Presenter dodatkom MPC-HC za titlove. Prikaz u gornjem sloju zrcaljenjem će MOŽDA raditi. \"True Color\" sustav boja radne površine preporučljiv. Preporučljivo za Windows XP."
+msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended."
+msgstr "Isti kao VMR-9 (u prozoru) ali sa Allocator-Presenter dodatkom iz MPC-HC za titlove. Zrcaljenje videa u sloju izna će MOŽDA raditi. Preporučen je \"True Color\" sustav boja radne površine."
 
 msgctxt "IDC_DSDXR"
 msgid "Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
@@ -645,13 +645,9 @@ msgctxt "IDC_DSNULL_UNCOMP"
 msgid "Same as the normal Null renderer, but this will only connect to uncompressed types."
 msgstr "Isti kao normalni Null prikazivač ali ovaj se samo spaja na nekomprimirane vrste."
 
-msgctxt "IDC_DSEVR"
-msgid "Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
-msgstr "Dostupno samo za Vista i noviji ili na XP-u sa barem .NET Framework 3.5 instaliranim."
-
 msgctxt "IDC_DSEVR_CUSTOM"
-msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended for Windows Vista or later."
-msgstr "Isti kao EVR ali sa Allocator-Presenter MPC-HC za titlove i postprocesiranje. Preporučljivo za Windows Vista ili noviji. "
+msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended."
+msgstr "Isti kao EVR ali sa Allocator-Presenter-om iz MPC-HC za titlove i postprocesiranje. Preporučeno. "
 
 msgctxt "IDC_DSMADVR"
 msgid "High-quality renderer, requires a GPU that supports D3D9 or later."
@@ -804,10 +800,6 @@ msgstr "Ako nema podrške za Pixel Shader 2.0 automatski je korišten jednostavn
 msgctxt "IDC_DSVMR9LOADMIXER"
 msgid "Puts VMR-9 (renderless) into mixer mode, this means most of the controls on its property page will work and it will use a separate worker thread to renderer frames."
 msgstr "Stavlja VMR-9 (bez-prikazivanja) u mikser način, ovo znači da će raditi većina kontrola na stranici svojstva, a koristiti će odvojenu radničku nit za prikazujuće slike."
-
-msgctxt "IDC_DSVMR9YUVMIXER"
-msgid "Improves performance at the cost of some compatibility of the renderer."
-msgstr "Poboljšava performanse na račun kompatibilnosti nekih prikazivača."
 
 msgctxt "IDC_FULLSCREEN_MONITOR_CHECK"
 msgid "Reduces tearing but prevents the toolbar from being shown."
@@ -1046,11 +1038,11 @@ msgid "Scale to 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 msgstr "Skaliraj na 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_WIDESCREEN"
-msgid "Zoom To Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Zumiraj na široki zaslon,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_ULTRAWIDE"
-msgid "Zoom To Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Zumiraj na ultra široki ekran,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_PLAYLIST_HIDEFS"
@@ -3599,7 +3591,7 @@ msgstr "XySubFilter"
 
 msgctxt "IDS_SUBTITLE_RENDERER_ASS_FILTER"
 msgid "AssFilter"
-msgstr ""
+msgstr "AssFilter"
 
 msgctxt "IDS_SUBDL_DLG_PROVIDER_COL"
 msgid "Provider"
@@ -3849,9 +3841,17 @@ msgctxt "IDS_CMD_PLAYNEXT"
 msgid "/playnext\t\tOpen next file in the folder after playback"
 msgstr "/playnext\t\tOtvori slijedeću datoteku u mapi nakon reprodukcije"
 
+msgctxt "IDS_CMD_MUTE"
+msgid "/mute\tMute the audio"
+msgstr ""
+
 msgctxt "IDS_CMD_FULLSCREEN"
 msgid "/fullscreen\tStart in fullscreen mode"
 msgstr "/fullscreen\tPokreni u načinu cijelog ekrana"
+
+msgctxt "IDS_CMD_VIEWPRESET"
+msgid "/viewpreset N\tStart with specific preset,\n\t\twhere N is either \"1\" Minimal, \"2\" Compact or \"3\" Normal"
+msgstr ""
 
 msgctxt "IDS_CMD_MINIMIZED"
 msgid "/minimized\tStart in minimized mode"
@@ -3868,6 +3868,10 @@ msgstr "/add\t\tDodaj \"naziv_putanje\" u listu za izvođenje, može se kombinir
 msgctxt "IDS_CMD_RANDOMIZE"
 msgid "/randomize\tRandomize the playlist"
 msgstr "/randomize\tIzmiješaj popis za izvođenje"
+
+msgctxt "IDS_CMD_VOLUME"
+msgid "/volume N\tSet Volume, where N is a range from 0 to 100"
+msgstr ""
 
 msgctxt "IDS_CMD_REGVID"
 msgid "/regvid\t\tCreate file associations for video files"
@@ -3971,5 +3975,5 @@ msgstr "Koristi zastarjelu alatnu traku umjesto nove vektorske."
 
 msgctxt "IDS_SUBMENU_COPYURL"
 msgid "Copy URL"
-msgstr ""
+msgstr "Kopiraj Link"
 

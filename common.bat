@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2015 see Authors.txt
+REM (C) 2015, 2017 see Authors.txt
 REM
 REM This file is part of MPC-HC.
 REM
@@ -44,6 +44,13 @@ EXIT /B
 :SubDoesExist
 FOR %%G IN (%~1) DO (SET FOUND=%%~$PATH:G)
 IF NOT DEFINED FOUND EXIT /B 1
+EXIT /B
+
+:SubParseConfig
+REM Parses mpc-hc_confg.h for MPC* defines
+FOR /F "tokens=2,3" %%A IN ('FINDSTR /R /C:"define MPC" "include\mpc-hc_config.h"') DO (
+  IF NOT DEFINED %%A SET "%%A=%%B"
+)
 EXIT /B
 
 :SubGetVersion
@@ -104,6 +111,10 @@ IF EXIST "%SEVENZIP_PATH%" (SET "SEVENZIP=%SEVENZIP_PATH%" & EXIT /B)
 FOR /F "tokens=2*" %%A IN (
   'REG QUERY "HKLM\SOFTWARE\7-Zip" /v "Path" 2^>NUL ^| FIND "REG_SZ" ^|^|
    REG QUERY "HKLM\SOFTWARE\Wow6432Node\7-Zip" /v "Path" 2^>NUL ^| FIND "REG_SZ"') DO SET "SEVENZIP=%%B\7z.exe"
+EXIT /B
+
+:SubVSPath
+FOR /f "delims=" %%A IN ('"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -property installationPath -latest -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.ATLMFC Microsoft.VisualStudio.Component.VC.Tools.x86.x64') DO SET "MPCHC_VS_PATH=%%A"
 EXIT /B
 
 :SubMsg

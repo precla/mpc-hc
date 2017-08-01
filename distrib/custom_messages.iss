@@ -1,4 +1,4 @@
-﻿; (C) 2009-2015 see Authors.txt
+﻿; (C) 2009-2017 see Authors.txt
 ;
 ; This file is part of MPC-HC.
 ;
@@ -28,7 +28,7 @@
 ; English
 WelcomeLabel1=[name/ver]
 en.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended that you close all other applications before continuing.
-en.WinVersionTooLowError=[name] requires Windows XP Service Pack 3 or newer to run.
+en.WinVersionTooLowError=[name] requires Windows Vista or newer to run.
 
 
 [CustomMessages]
@@ -37,9 +37,7 @@ en.langid=00000000
 en.comp_mpciconlib=Icon Library
 en.comp_mpcresources=Translations
 en.msg_DeleteSettings=Do you also want to delete MPC-HC settings?%n%nIf you plan on installing MPC-HC again then you do not have to delete them.
-#if defined(sse_required)
-en.msg_simd_sse=This build of MPC-HC requires a CPU with SSE extension support.%n%nYour CPU does not have those capabilities.
-#elif defined(sse2_required)
+#if defined(sse2_required)
 en.msg_simd_sse2=This build of MPC-HC requires a CPU with SSE2 extension support.%n%nYour CPU does not have those capabilities.
 #endif
 en.run_DownloadToolbarImages=Visit our Wiki page to download toolbar images

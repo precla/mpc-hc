@@ -28,7 +28,6 @@
 #include "FakeFilterMapper2.h"
 #include "FileAssoc.h"
 #include "FileVersionInfo.h"
-#include "SysVersion.h"
 #include "Ifo.h"
 #include "MainFrm.h"
 #include "MhookHelper.h"
@@ -45,6 +44,7 @@
 #include <atlsync.h>
 #include <winternl.h>
 #include <regex>
+#include "ExceptionHandler.h"
 
 #define HOOKS_BUGS_URL _T("https://trac.mpc-hc.org/ticket/3739")
 
@@ -848,13 +848,13 @@ void CMPlayerCApp::InitProfile()
 
     if (!m_pszRegistryKey) {
         // Don't reread mpc-hc.ini if the cache needs to be flushed or it was accessed recently
-        if (m_bProfileInitialized && (m_bQueuedProfileFlush || GetTickCount() - m_dwProfileLastAccessTick < 100)) {
-            m_dwProfileLastAccessTick = GetTickCount();
+        if (m_bProfileInitialized && (m_bQueuedProfileFlush || GetTickCount64() - m_dwProfileLastAccessTick < 100ULL)) {
+            m_dwProfileLastAccessTick = GetTickCount64();
             return;
         }
 
         m_bProfileInitialized = true;
-        m_dwProfileLastAccessTick = GetTickCount();
+        m_dwProfileLastAccessTick = GetTickCount64();
 
         ASSERT(m_pszProfileName);
         if (!PathUtils::Exists(m_pszProfileName)) {
@@ -925,7 +925,7 @@ void CMPlayerCApp::InitProfile()
         fpStatus = fclose(fp);
         ASSERT(fpStatus == 0);
 
-        m_dwProfileLastAccessTick = GetTickCount();
+        m_dwProfileLastAccessTick = GetTickCount64();
     }
 }
 
@@ -1442,7 +1442,8 @@ MMRESULT WINAPI Mine_mixerSetControlDetails(HMIXEROBJ hmxobj, LPMIXERCONTROLDETA
 BOOL (WINAPI* Real_LockWindowUpdate)(HWND) = LockWindowUpdate;
 BOOL WINAPI Mine_LockWindowUpdate(HWND hWndLock)
 {
-    if (SysVersion::IsVistaOrLater() && hWndLock == ::GetDesktopWindow()) {
+    // TODO: Check if needed on Windows 8+
+    if (hWndLock == ::GetDesktopWindow()) {
         // locking the desktop window with aero active locks the entire compositor,
         // unfortunately MFC does that (when dragging CControlBar) and we want to prevent it
         return FALSE;
@@ -1459,6 +1460,9 @@ BOOL CMPlayerCApp::InitInstance()
     // At this point we have not hooked this function yet so we get the real result
     if (!IsDebuggerPresent()) {
         CrashReporter::Enable();
+        if (!CrashReporter::IsEnabled()) {
+            MPCExceptionHandler::Enable();
+        }
     }
 
     if (!HeapSetInformation(nullptr, HeapEnableTerminationOnCorruption, nullptr, 0)) {
@@ -1471,6 +1475,7 @@ BOOL CMPlayerCApp::InitInstance()
     bHookingSuccessful &= !!Mhook_SetHookEx(&Real_IsDebuggerPresent, Mine_IsDebuggerPresent);
 
     m_hNTDLL = LoadLibrary(_T("ntdll.dll"));
+#if 0
 #ifndef _DEBUG  // Disable NtQueryInformationProcess in debug (prevent VS debugger to stop on crash address)
     if (m_hNTDLL) {
         Real_NtQueryInformationProcess = (decltype(Real_NtQueryInformationProcess))GetProcAddress(m_hNTDLL, "NtQueryInformationProcess");
@@ -1479,6 +1484,7 @@ BOOL CMPlayerCApp::InitInstance()
             bHookingSuccessful &= !!Mhook_SetHookEx(&Real_NtQueryInformationProcess, Mine_NtQueryInformationProcess);
         }
     }
+#endif
 #endif
 
     bHookingSuccessful &= !!Mhook_SetHookEx(&Real_CreateFileW, Mine_CreateFileW);

@@ -2,14 +2,14 @@
 # Copyright (C) 2002 - 2017 see Authors.txt
 # This file is distributed under the same license as the MPC-HC package.
 # Translators:
-# Dean Lee <xslidian@gmail.com>, 2015
+# Dian Li <xslidian@gmail.com>, 2015
 # Ming Chen <yzonline@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: MPC-HC\n"
-"POT-Creation-Date: 2015-07-20 20:29:41+0000\n"
-"PO-Revision-Date: 2015-07-24 08:44+0000\n"
-"Last-Translator: JellyFrog\n"
+"POT-Creation-Date: 2017-07-30 20:54:11+0000\n"
+"PO-Revision-Date: 2017-07-30 21:14+0000\n"
+"Last-Translator: kasper93\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/mpc-hc/mpc-hc/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,8 +22,8 @@ msgid "This will install [name] on your computer.\n\nIt is recommended that you 
 msgstr "这将安装 [name] 到您的计算机中。\n\n建议您在继续之前关闭所有其它的应用程序。"
 
 msgctxt "Messages_WinVersionTooLowError"
-msgid "[name] requires Windows XP Service Pack 3 or newer to run."
-msgstr "[name] 要求 Windows XP Service Pack 3 或更高版本。"
+msgid "[name] requires Windows Vista or newer to run."
+msgstr ""
 
 msgctxt "CustomMessages_comp_mpciconlib"
 msgid "Icon Library"
@@ -36,10 +36,6 @@ msgstr "翻译"
 msgctxt "CustomMessages_msg_DeleteSettings"
 msgid "Do you also want to delete MPC-HC settings?\n\nIf you plan on installing MPC-HC again then you do not have to delete them."
 msgstr "是否同时删除 MPC-HC 设置？\n\n如果您打算再次安装 MPC-HC 则不必删除。"
-
-msgctxt "CustomMessages_msg_simd_sse"
-msgid "This build of MPC-HC requires a CPU with SSE extension support.\n\nYour CPU does not have those capabilities."
-msgstr "此 MPC-HC 编译版本要求 CPU 支持 SSE 指令集。\n\n您的 CPU 不具备该能力。"
 
 msgctxt "CustomMessages_msg_simd_sse2"
 msgid "This build of MPC-HC requires a CPU with SSE2 extension support.\n\nYour CPU does not have those capabilities."

@@ -25,15 +25,16 @@
 #include "FGFilter.h"
 #include "FakeFilterMapper2.h"
 #include "FileAssoc.h"
-#include "SysVersion.h"
+#include "ExceptionHandler.h"
 #include "PathUtils.h"
 #include "Translations.h"
 #include "UpdateChecker.h"
 #include "WinAPIUtils.h"
 #include "moreuuids.h"
 #include "mplayerc.h"
-#include <mvrInterfaces.h>
 #include "../thirdparty/sanear/sanear/src/Factory.h"
+#include <VersionHelpersInternal.h>
+#include <mvrInterfaces.h>
 
 #pragma warning(push)
 #pragma warning(disable: 4351) // new behavior: elements of array 'array' will be default initialized
@@ -210,6 +211,7 @@ CAppSettings::CAppSettings()
     , bEnableLogging(false)
     , bUseLegacyToolbar(false)
     , iLAVGPUDevice(DWORD_MAX)
+    , nCmdVolume(0)
     , eSubtitleRenderer(SubtitleRenderer::INTERNAL)
 {
     // Internal source filter
@@ -266,6 +268,7 @@ CAppSettings::CAppSettings()
 #endif
 #if INTERNAL_SOURCEFILTER_MPEG
     SrcFiltersKeys[SRC_MPEG] = FilterKey(_T("SRC_MPEG"), true);
+    SrcFiltersKeys[SRC_MPEGTS] = FilterKey(_T("SRC_MPEGTS"), true);
 #endif
 #if INTERNAL_SOURCEFILTER_MPEGAUDIO
     SrcFiltersKeys[SRC_MPA] = FilterKey(_T("SRC_MPA"), true);
@@ -1074,12 +1077,10 @@ void CAppSettings::SaveSettings()
             pApp->WriteProfileInt(IDS_R_SANEAR, IDS_RS_SANEAR_DEVICE_BUFFER, uBufferDuration);
         }
 
-        BOOL bAllowBitstreaming;
-        sanear->GetAllowBitstreaming(&bAllowBitstreaming);
+        BOOL bAllowBitstreaming = sanear->GetAllowBitstreaming();
         pApp->WriteProfileInt(IDS_R_SANEAR, IDS_RS_SANEAR_ALLOW_BITSTREAMING, bAllowBitstreaming);
 
-        BOOL bCrossfeedEnabled;
-        sanear->GetCrossfeedEnabled(&bCrossfeedEnabled);
+        BOOL bCrossfeedEnabled = sanear->GetCrossfeedEnabled();
         pApp->WriteProfileInt(IDS_R_SANEAR, IDS_RS_SANEAR_CROSSFEED_ENABLED, bCrossfeedEnabled);
 
         UINT32 uCutoffFrequency, uCrossfeedLevel;
@@ -1339,7 +1340,7 @@ void CAppSettings::LoadSettings()
     eLoopMode = static_cast<LoopMode>(pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LOOPMODE, static_cast<int>(LoopMode::PLAYLIST)));
     iZoomLevel = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ZOOM, 1);
     iDSVideoRendererType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DSVIDEORENDERERTYPE,
-                                               (SysVersion::IsVistaOrLater() && IsVideoRendererAvailable(VIDRNDT_DS_EVR_CUSTOM)) ? VIDRNDT_DS_EVR_CUSTOM : VIDRNDT_DS_VMR9RENDERLESS);
+                                               IsVideoRendererAvailable(VIDRNDT_DS_EVR_CUSTOM) ? VIDRNDT_DS_EVR_CUSTOM : VIDRNDT_DS_VMR9RENDERLESS);
     iRMVideoRendererType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RMVIDEORENDERERTYPE, VIDRNDT_RM_DEFAULT);
     iQTVideoRendererType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_QTVIDEORENDERERTYPE, VIDRNDT_QT_DEFAULT);
     nVolumeStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUMESTEP, 5);
@@ -1376,18 +1377,14 @@ void CAppSettings::LoadSettings()
     strFullScreenMonitor = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR);
     // Prevent Minimize when in fullscreen mode on non default monitor
     fPreventMinimize = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PREVENT_MINIMIZE, FALSE);
-    bUseEnhancedTaskBar = SysVersion::Is7OrLater() ? !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENHANCED_TASKBAR, TRUE) : FALSE;
+    bUseEnhancedTaskBar = IsWindows7OrGreater() ? !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENHANCED_TASKBAR, TRUE) : FALSE;
     fUseSearchInFolder = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SEARCH_IN_FOLDER, TRUE);
     fUseTimeTooltip = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, TRUE);
     nTimeTooltipPosition = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, TIME_TOOLTIP_ABOVE_SEEKBAR);
-    nOSDSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_OSD_SIZE, SysVersion::IsVistaOrLater() ? 18 : 20);
-    if (SysVersion::IsVistaOrLater()) {
-        LOGFONT lf;
-        GetMessageFont(&lf);
-        strOSDFont = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_MPC_OSD_FONT, lf.lfFaceName);
-    } else {
-        strOSDFont = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_MPC_OSD_FONT, _T("Arial"));
-    }
+    nOSDSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_OSD_SIZE, 18);
+    LOGFONT lf;
+    GetMessageFont(&lf);
+    strOSDFont = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_MPC_OSD_FONT, lf.lfFaceName);
 
     // Associated types with icon or not...
     fAssociatedWithIcons = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, TRUE);
@@ -1847,7 +1844,6 @@ void CAppSettings::UpdateRenderersData(bool fSave)
         pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, r.iAPSurfaceUsage);
         pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, r.iDX9Resizer);
         pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMR9MIXERMODE, r.fVMR9MixerMode);
-        pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMR9MIXERYUV, r.fVMR9MixerYUV);
 
         pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRAlternateVSync"), ars.bVMR9AlterativeVSync);
         pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRVSyncOffset"), ars.iVMR9VSyncOffset);
@@ -1897,10 +1893,9 @@ void CAppSettings::UpdateRenderersData(bool fSave)
 
         pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE, r.D3D9RenderDevice);
     } else {
-        r.iAPSurfaceUsage = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, (SysVersion::IsVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D));
+        r.iAPSurfaceUsage = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, VIDRNDT_AP_TEXTURE3D);
         r.iDX9Resizer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, 1);
         r.fVMR9MixerMode = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMR9MIXERMODE, TRUE);
-        r.fVMR9MixerYUV = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMR9MIXERYUV, FALSE);
 
         CRenderersSettings::CAdvRendererSettings DefaultSettings;
         ars.bVMR9AlterativeVSync = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRAlternateVSync"), DefaultSettings.bVMR9AlterativeVSync);
@@ -1953,7 +1948,7 @@ void CAppSettings::UpdateRenderersData(bool fSave)
             ars.sShaderCachePath = PathUtils::CombinePaths(ars.sShaderCachePath, IDS_R_SHADER_CACHE);
         }
 
-        r.fResetDevice = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), !SysVersion::IsVistaOrLater());
+        r.fResetDevice = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), FALSE);
 
         r.subPicQueueSettings.nSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, 10);
         r.subPicQueueSettings.nMaxRes = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCMAXRES, 0);
@@ -2105,6 +2100,14 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
                 nCLSwitches |= CLSW_ADD;
             } else if (sw == _T("randomize")) {
                 nCLSwitches |= CLSW_RANDOMIZE;
+            } else if (sw == _T("volume") && pos) {
+                int setVolumeVal = _ttoi(cmdln.GetNext(pos));
+                if (setVolumeVal >= 0 && setVolumeVal <= 100) {
+                    nCmdVolume = setVolumeVal;
+                    nCLSwitches |= CLSW_VOLUME;
+                } else {
+                    nCLSwitches |= CLSW_UNRECOGNIZEDSWITCH;
+                }
             } else if (sw == _T("regvid")) {
                 nCLSwitches |= CLSW_REGEXTVID;
             } else if (sw == _T("regaud")) {
@@ -2158,6 +2161,22 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
                         nCLSwitches |= CLSW_FIXEDSIZE;
                     }
                 }
+            } else if (sw == _T("viewpreset") && pos) {
+                int viewPreset = _ttoi(cmdln.GetNext(pos));
+                switch (viewPreset) {
+                    case 1:
+                        nCLSwitches |= CLSW_PRESET1;
+                        break;
+                    case 2:
+                        nCLSwitches |= CLSW_PRESET2;
+                        break;
+                    case 3:
+                        nCLSwitches |= CLSW_PRESET3;
+                        break;
+                    default:
+                        nCLSwitches |= CLSW_UNRECOGNIZEDSWITCH;
+                        break;
+                }
             } else if (sw == _T("monitor") && pos) {
                 iMonitor = _tcstol(cmdln.GetNext(pos), nullptr, 10);
                 nCLSwitches |= CLSW_MONITOR;
@@ -2172,12 +2191,15 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
                 fShowDebugInfo = true;
             } else if (sw == _T("nocrashreporter")) {
                 CrashReporter::Disable();
+                MPCExceptionHandler::Enable();
             } else if (sw == _T("audiorenderer") && pos) {
                 SetAudioRenderer(_ttoi(cmdln.GetNext(pos)));
             } else if (sw == _T("shaderpreset") && pos) {
                 m_Shaders.SetCurrentPreset(cmdln.GetNext(pos));
             } else if (sw == _T("reset")) {
                 nCLSwitches |= CLSW_RESET;
+            } else if (sw == _T("mute")) {
+                nCLSwitches |= CLSW_MUTE;
             } else if (sw == _T("monitoroff")) {
                 nCLSwitches |= CLSW_MONITOROFF;
             } else if (sw == _T("playnext")) {
@@ -2563,7 +2585,7 @@ void CAppSettings::UpdateSettings()
                     subrenderer = SubtitleRenderer::VS_FILTER;
                 }
                 if (IsSubtitleRendererRegistered(SubtitleRenderer::XY_SUB_FILTER)) {
-                    int renderer = (SysVersion::IsVistaOrLater() && IsVideoRendererAvailable(VIDRNDT_DS_EVR_CUSTOM)) ? VIDRNDT_DS_EVR_CUSTOM : VIDRNDT_DS_VMR9RENDERLESS;
+                    int renderer = IsVideoRendererAvailable(VIDRNDT_DS_EVR_CUSTOM) ? VIDRNDT_DS_EVR_CUSTOM : VIDRNDT_DS_VMR9RENDERLESS;
                     renderer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DSVIDEORENDERERTYPE, renderer);
                     if (IsSubtitleRendererSupported(SubtitleRenderer::XY_SUB_FILTER, renderer)) {
                         subrenderer = SubtitleRenderer::XY_SUB_FILTER;

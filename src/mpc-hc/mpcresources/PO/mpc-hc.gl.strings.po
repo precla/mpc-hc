@@ -7,9 +7,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: MPC-HC\n"
-"POT-Creation-Date: 2017-06-03 12:18:37+0000\n"
-"PO-Revision-Date: 2017-06-03 15:00+0000\n"
-"Last-Translator: JellyFrog\n"
+"POT-Creation-Date: 2017-07-30 18:43:01+0000\n"
+"PO-Revision-Date: 2017-07-30 21:13+0000\n"
+"Last-Translator: kasper93\n"
 "Language-Team: Galician (http://www.transifex.com/mpc-hc/mpc-hc/language/gl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -483,11 +483,11 @@ msgstr "Axustes"
 
 msgctxt "IDD_PPAGEAUDIOSWITCHER"
 msgid "Internal Filters::Audio Switcher"
-msgstr "Filtros Internos::Cambia Audio"
+msgstr "Filtros Internos::Cambiar audio"
 
 msgctxt "IDD_PPAGEEXTERNALFILTERS"
 msgid "External Filters"
-msgstr "Filtros Externos"
+msgstr "Filtros externos"
 
 msgctxt "IDD_PPAGESHADERS"
 msgid "Playback::Shaders"
@@ -587,7 +587,7 @@ msgstr "Subtítulos::Estilo predefinido"
 
 msgctxt "IDD_PPAGEINTERNALFILTERS"
 msgid "Internal Filters"
-msgstr "Filtros Internos"
+msgstr "Filtros internos"
 
 msgctxt "IDD_PPAGELOGO"
 msgid "Player::Logo"
@@ -610,8 +610,8 @@ msgid "Clip"
 msgstr "Clip"
 
 msgctxt "IDC_DSSYSDEF"
-msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason. On Windown XP this is the same as VMR-7 (windowed)."
-msgstr "Filtro renderizador predeterminado para DirectShow. Outros utilizarano cando non poidan cargarse adecuadamente por calquera razón. En Windows XP é o mesmo que VMR-7 (xanela)."
+msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason."
+msgstr ""
 
 msgctxt "IDC_DSOLD"
 msgid "This is the default renderer of Windows 9x/me/2k. Depending on the visibility of the video window and your video card's abilities, it will switch between GDI, DirectDraw, Overlay rendering modes dynamically."
@@ -626,8 +626,8 @@ msgid "Only available if you have DirectX 9 installed. Very stable but it will n
 msgstr "O Renderizador Mesturador de Vídeo 9 só está dispoñible se ten o entorno DirectX 9 instalado. É moi estable, pero nunca usará renderizado Overlay (hardware de renderizado directo) e a causa disto pode ser un pouco máis lento ca o filtro renderizador Overlay Mixer."
 
 msgctxt "IDC_DSVMR9REN"
-msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended. Recommended for Windows XP."
-msgstr "O mesmo que VMR-9 (xanela), pero co complemento \"Allocator-Presenter\" de MPC-HC para o subtitulado. O espelo de Overlay TALVEZ funcionara. Recomendase a profundidade de cor do escritorio \"Cor Verdadeiro\"."
+msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended."
+msgstr ""
 
 msgctxt "IDC_DSDXR"
 msgid "Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
@@ -641,13 +641,9 @@ msgctxt "IDC_DSNULL_UNCOMP"
 msgid "Same as the normal Null renderer, but this will only connect to uncompressed types."
 msgstr "Igual que o renderizador Nulo normal, pero este só conectara a tipos sen compresión."
 
-msgctxt "IDC_DSEVR"
-msgid "Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
-msgstr "Só dispoñible en Vista ou superior ou en XP tendo polo menos o Marco de traballo .Net 3.5 instalado."
-
 msgctxt "IDC_DSEVR_CUSTOM"
-msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended for Windows Vista or later."
-msgstr "Igual que EVR, pero con Asignación-Presentación do MPC-HC por subtitulado e postprocesamento. Recomendado para Windows Vista ou posterior."
+msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended."
+msgstr ""
 
 msgctxt "IDC_DSMADVR"
 msgid "High-quality renderer, requires a GPU that supports D3D9 or later."
@@ -800,10 +796,6 @@ msgstr "Se non hai soporte para Pixel Shader 2.0, usarase automáticamente o red
 msgctxt "IDC_DSVMR9LOADMIXER"
 msgid "Puts VMR-9 (renderless) into mixer mode, this means most of the controls on its property page will work and it will use a separate worker thread to renderer frames."
 msgstr "Pon a VMR-9 (sen renderizador) no modo do mesturador, isto significa que a maioría dos controis da páxina de propiedades funcionaran e usara un proceso de traballo separado para renderizar cadros."
-
-msgctxt "IDC_DSVMR9YUVMIXER"
-msgid "Improves performance at the cost of some compatibility of the renderer."
-msgstr "Mellora o rendemento ao custo de algunha incompatibilidade do renderizador."
 
 msgctxt "IDC_FULLSCREEN_MONITOR_CHECK"
 msgid "Reduces tearing but prevents the toolbar from being shown."
@@ -1042,11 +1034,11 @@ msgid "Scale to 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 msgstr "Escalar a 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_WIDESCREEN"
-msgid "Zoom To Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Zoom a Widescreen,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_ULTRAWIDE"
-msgid "Zoom To Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Zoom a Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_PLAYLIST_HIDEFS"
@@ -1359,23 +1351,23 @@ msgstr "Baixar"
 
 msgctxt "IDS_NAVIGATION_SORT"
 msgid "Sort by LCN"
-msgstr ""
+msgstr "Ordear por número de canle lóxico (LCN)"
 
 msgctxt "IDS_NAVIGATION_REMOVE_ALL"
 msgid "Remove all"
-msgstr ""
+msgstr "Eliminar todo"
 
 msgctxt "IDS_REMOVE_CHANNELS_QUESTION"
 msgid "Are you sure you want to remove all channels from the list?"
-msgstr ""
+msgstr "Está seguro de que quere eliminar todas as canles da lista?"
 
 msgctxt "IDS_MEDIAINFO_NO_INFO_AVAILABLE"
 msgid "No information available"
-msgstr ""
+msgstr "Non hai información dispoñible"
 
 msgctxt "IDS_MEDIAINFO_ANALYSIS_IN_PROGRESS"
 msgid "Please wait, analysis in progress..."
-msgstr ""
+msgstr "Por favor agarde, estase analizando..."
 
 msgctxt "IDS_ASPECT_RATIO_FMT"
 msgid "AR %d:%d"
@@ -1619,7 +1611,7 @@ msgstr "Diminuír taxa"
 
 msgctxt "IDS_AG_RESET_RATE"
 msgid "Reset Rate"
-msgstr "Reiniciar Velocidade"
+msgstr "Reiniciar velocidade"
 
 msgctxt "IDS_MPLAYERC_21"
 msgid "Audio Delay +10 ms"
@@ -1827,7 +1819,7 @@ msgstr "%d subtítulo(s) dispoñible(s)."
 
 msgctxt "IDS_UPDATE_CONFIG_AUTO_CHECK"
 msgid "Do you want to check periodically for MPC-HC updates?\n\nThis feature can be disabled later from the Miscellaneous options page."
-msgstr "Desexas comprobar periódicamente se hai actualizacións dispoñibles para MPC-HC?\n\nEsta característica pode ser inhabilitada logo dende a páxina de opcións Misceláneas."
+msgstr "Desexas comprobar periódicamente se hai actualizacións dispoñibles para MPC-HC?\n\nEsta característica pode ser inhabilitada logo dende a páxina de opcións misceláneas."
 
 msgctxt "IDS_ZOOM_50"
 msgid "50%"
@@ -3845,9 +3837,17 @@ msgctxt "IDS_CMD_PLAYNEXT"
 msgid "/playnext\t\tOpen next file in the folder after playback"
 msgstr "/playnext\t\tAbre o seguinte ficheiro do cartafol tras a reprodución"
 
+msgctxt "IDS_CMD_MUTE"
+msgid "/mute\tMute the audio"
+msgstr ""
+
 msgctxt "IDS_CMD_FULLSCREEN"
 msgid "/fullscreen\tStart in fullscreen mode"
 msgstr "/fullscreen\tInicia o reprodutor en pantalla completa"
+
+msgctxt "IDS_CMD_VIEWPRESET"
+msgid "/viewpreset N\tStart with specific preset,\n\t\twhere N is either \"1\" Minimal, \"2\" Compact or \"3\" Normal"
+msgstr ""
 
 msgctxt "IDS_CMD_MINIMIZED"
 msgid "/minimized\tStart in minimized mode"
@@ -3864,6 +3864,10 @@ msgstr "/add\t\tEngade unha \"ruta\" á lista de reprodución, podese combinar c
 msgctxt "IDS_CMD_RANDOMIZE"
 msgid "/randomize\tRandomize the playlist"
 msgstr "/randomize\tReproduce en orde aleatorio a lista de reprodución"
+
+msgctxt "IDS_CMD_VOLUME"
+msgid "/volume N\tSet Volume, where N is a range from 0 to 100"
+msgstr ""
 
 msgctxt "IDS_CMD_REGVID"
 msgid "/regvid\t\tCreate file associations for video files"
@@ -3967,5 +3971,5 @@ msgstr "Usar antiga barra de ferramentas en lugar da nova vectorizada."
 
 msgctxt "IDS_SUBMENU_COPYURL"
 msgid "Copy URL"
-msgstr ""
+msgstr "Copiar URL"
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -23,7 +23,10 @@
 #include "RenderersSettings.h"
 #include "../../../mpc-hc/AppSettings.h"
 #include "../../../mpc-hc/mplayerc.h"
-#include "../../../DSUtil/SysVersion.h"
+#include <mpc-hc_config.h>
+#include <d3d9.h>
+#include <d3d10.h>
+#include <dxgi.h>
 #include <d3dx9.h>
 
 void CRenderersSettings::UpdateData(bool fSave)
@@ -37,7 +40,7 @@ void CRenderersSettings::CAdvRendererSettings::SetDefault()
     iVMR9VSyncOffset                  = 0;
     bVMR9VSyncAccurate                = false;
     bVMR9FullscreenGUISupport         = false;
-    bVMR9VSync                        = !SysVersion::IsVistaOrLater();
+    bVMR9VSync                        = false;
     bVMR9FullFloatingPointProcessing  = false;
     bVMR9HalfFloatingPointProcessing  = false;
     bVMR9ColorManagementEnable        = false;
@@ -70,7 +73,7 @@ void CRenderersSettings::CAdvRendererSettings::SetOptimal()
     bVMR9VSyncAccurate                = true;
     bVMR9FullscreenGUISupport         = false;
     bVMR9VSync                        = true;
-    bVMR9FullFloatingPointProcessing  = true;
+    bVMR9FullFloatingPointProcessing  = false;
     bVMR9HalfFloatingPointProcessing  = false;
     bVMR9ColorManagementEnable        = false;
     iVMR9ColorManagementInput         = VIDEO_SYSTEM_UNKNOWN;
@@ -123,7 +126,7 @@ LONGLONG CRenderersData::GetPerfCounter() const
 HINSTANCE CRenderersData::GetD3X9Dll()
 {
     // D3DX9 v43 is the latest available and will not get any update. We support only this specific version.
-    static_assert(D3DX_SDK_VERSION == 43, "Different D3DX9 version?");
+    static_assert(D3DX_SDK_VERSION == MPC_DX_SDK_NUMBER, "Different D3DX9 version?");
     if (m_hD3DX9Dll == nullptr) {
         m_strD3DX9Version.Format(_T("d3dx9_%u.dll"), D3DX_SDK_VERSION);
         m_hD3DX9Dll = LoadLibrary(m_strD3DX9Version);

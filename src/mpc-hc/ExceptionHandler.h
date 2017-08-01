@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2015 see Authors.txt
+ * (C) 2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -20,22 +20,8 @@
 
 #pragma once
 
-#include <Windows.h>
-
-namespace SysVersion
+namespace MPCExceptionHandler
 {
-    OSVERSIONINFOEX GetFullVersion();
-    DWORD GetVersion();
-
-    bool IsXPOrLater();
-    bool IsVista();
-    bool IsVistaOrLater();
-    bool Is7();
-    bool Is7OrLater();
-    bool Is8();
-    bool Is8OrLater();
-    bool Is81OrLater();
-    bool Is10OrLater();
-
-    bool Is64Bit();
+    void Enable();
+    void Disable();
 };

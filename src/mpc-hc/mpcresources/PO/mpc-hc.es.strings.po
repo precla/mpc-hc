@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the MPC-HC package.
 # Translators:
 # Adolfo Jayme Barrientos, 2014-2015
+# Adolfo Jayme Barrientos, 2017
 # Adolfo Jayme Barrientos, 2015-2016
 # Adolfo Jayme Barrientos, 2014
 # Ernesto Avilés Vázquez <whippiii@gmail.com>, 2013
@@ -16,9 +17,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: MPC-HC\n"
-"POT-Creation-Date: 2017-06-03 12:18:37+0000\n"
-"PO-Revision-Date: 2017-06-03 15:00+0000\n"
-"Last-Translator: JellyFrog\n"
+"POT-Creation-Date: 2017-07-30 18:43:01+0000\n"
+"PO-Revision-Date: 2017-07-30 21:12+0000\n"
+"Last-Translator: kasper93\n"
 "Language-Team: Spanish (http://www.transifex.com/mpc-hc/mpc-hc/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -619,8 +620,8 @@ msgid "Clip"
 msgstr "Clip"
 
 msgctxt "IDC_DSSYSDEF"
-msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason. On Windown XP this is the same as VMR-7 (windowed)."
-msgstr "Filtro renderizador de vídeo predeterminado para DirectShow. Otros filtros recurrirán a este cuando no puedan cargarse adecuadamente por cualquier motivo. En Windows XP es el propio VMR-7 (modo ventana)."
+msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason."
+msgstr ""
 
 msgctxt "IDC_DSOLD"
 msgid "This is the default renderer of Windows 9x/me/2k. Depending on the visibility of the video window and your video card's abilities, it will switch between GDI, DirectDraw, Overlay rendering modes dynamically."
@@ -635,8 +636,8 @@ msgid "Only available if you have DirectX 9 installed. Very stable but it will n
 msgstr "El Renderizador Mezclador de Vídeo 9 sólo está disponible si tiene el entorno DirectX 9 instalado. Es muy estable, pero nunca usará renderizado Overlay (hardware de renderizado directo) y a causa de esto puede ser un poco más lento que que el filtro renderizador Overlay Mixer."
 
 msgctxt "IDC_DSVMR9REN"
-msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended. Recommended for Windows XP."
-msgstr "Lo mismo que el renderizador VMR-9 (modo ventana), pero con el componente Allocator-Presenter (asignador-presentador) de MPC-HC para el subtitulado. La replicación de vídeo en modo Overlay (hardware de renderizado directo) QUIZÁ funcione. Se recomienda la profundidad de color de escritorio «Color verdadero». Está indicado para Windows XP."
+msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended."
+msgstr ""
 
 msgctxt "IDC_DSDXR"
 msgid "Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
@@ -650,13 +651,9 @@ msgctxt "IDC_DSNULL_UNCOMP"
 msgid "Same as the normal Null renderer, but this will only connect to uncompressed types."
 msgstr "Renderizador nulo igual que el normal, pero este sólo conectara con medios de tipos sin compresión."
 
-msgctxt "IDC_DSEVR"
-msgid "Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
-msgstr "Solo disponible en Vista o superior, o en XP con .NET Framework 3.5 o superior instalado."
-
 msgctxt "IDC_DSEVR_CUSTOM"
-msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended for Windows Vista or later."
-msgstr "Lo mismo que el renderizador EVR, pero con el componente Allocator-Presenter (asignador-presentador) de MPC-HC para el subtitulado y postprocesado. Está indicado para Windows Vista o superior."
+msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended."
+msgstr ""
 
 msgctxt "IDC_DSMADVR"
 msgid "High-quality renderer, requires a GPU that supports D3D9 or later."
@@ -809,10 +806,6 @@ msgstr "Si no hay soporte para Pixel Shader 2.0 (PS 2.0), se usará automáticam
 msgctxt "IDC_DSVMR9LOADMIXER"
 msgid "Puts VMR-9 (renderless) into mixer mode, this means most of the controls on its property page will work and it will use a separate worker thread to renderer frames."
 msgstr "Pone el renderizador VMR-9 (sin renderizado) en modo mezclador, esto significa que la mayoría de los controles de su página de propiedades funcionarán y usará un subproceso de trabajo aparte para renderizar fotogramas."
-
-msgctxt "IDC_DSVMR9YUVMIXER"
-msgid "Improves performance at the cost of some compatibility of the renderer."
-msgstr "Mejora el rendimiento a cambio de cierta compatibilidad del renderizador."
 
 msgctxt "IDC_FULLSCREEN_MONITOR_CHECK"
 msgid "Reduces tearing but prevents the toolbar from being shown."
@@ -1051,11 +1044,11 @@ msgid "Scale to 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 msgstr "Escalar a 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_WIDESCREEN"
-msgid "Zoom To Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Escalar a pantalla panorámica,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_ULTRAWIDE"
-msgid "Zoom To Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Escalar a pantalla ultrapanorámica,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_PLAYLIST_HIDEFS"
@@ -3854,9 +3847,17 @@ msgctxt "IDS_CMD_PLAYNEXT"
 msgid "/playnext\t\tOpen next file in the folder after playback"
 msgstr "/playnext\t\tAbre el siguiente archivo de la carpeta tras la reproducción"
 
+msgctxt "IDS_CMD_MUTE"
+msgid "/mute\tMute the audio"
+msgstr ""
+
 msgctxt "IDS_CMD_FULLSCREEN"
 msgid "/fullscreen\tStart in fullscreen mode"
 msgstr "/fullscreen\tInicia el reproductor en pantalla completa"
+
+msgctxt "IDS_CMD_VIEWPRESET"
+msgid "/viewpreset N\tStart with specific preset,\n\t\twhere N is either \"1\" Minimal, \"2\" Compact or \"3\" Normal"
+msgstr ""
 
 msgctxt "IDS_CMD_MINIMIZED"
 msgid "/minimized\tStart in minimized mode"
@@ -3873,6 +3874,10 @@ msgstr "/add\t\tAñade una \"ruta\" a la lista de reproducción, se puede combin
 msgctxt "IDS_CMD_RANDOMIZE"
 msgid "/randomize\tRandomize the playlist"
 msgstr "/randomize\tReproduce en orden aleatorio la lista de reproducción"
+
+msgctxt "IDS_CMD_VOLUME"
+msgid "/volume N\tSet Volume, where N is a range from 0 to 100"
+msgstr ""
 
 msgctxt "IDS_CMD_REGVID"
 msgid "/regvid\t\tCreate file associations for video files"
@@ -3976,5 +3981,5 @@ msgstr "Usar antigua barra de herramientas en lugar de la nueva vectorizada."
 
 msgctxt "IDS_SUBMENU_COPYURL"
 msgid "Copy URL"
-msgstr ""
+msgstr "Copiar URL"
 

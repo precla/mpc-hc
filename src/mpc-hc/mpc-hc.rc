@@ -258,7 +258,7 @@ BEGIN
     CONTROL         "Remember DVD position",IDC_DVD_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,180,160,8
     CONTROL         "Remember last window position",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,193,160,8
     CONTROL         "Remember last window size",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,206,160,8
-    CONTROL         "Remember last Pan-n-Scan Zoom",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,219,160,8
+    CONTROL         "Remember last Pan&Scan Zoom",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,219,160,8
 END
 
 IDD_PPAGEDVD DIALOGEX 0, 0, 296, 241
@@ -756,7 +756,7 @@ BEGIN
     PUSHBUTTON      "Browse...",IDC_BUTTON2,241,222,50,14
 END
 
-IDD_PPAGEOUTPUT DIALOGEX 0, 0, 296, 250
+IDD_PPAGEOUTPUT DIALOGEX 0, 0, 296, 241
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -768,7 +768,7 @@ BEGIN
     COMBOBOX        IDC_QTRND_COMBO,155,59,131,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Audio Renderer",IDC_STATIC,5,90,285,30
     COMBOBOX        IDC_AUDRND_COMBO,10,102,276,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "VMR-9 (renderless) and EVR (CP) settings",IDC_STATIC,5,153,285,93
+    GROUPBOX        "VMR-9 (renderless) and EVR (CP) settings",IDC_STATIC,5,153,285,83
     RTEXT           "Surface:",IDC_STATIC,118,184,60,8
     COMBOBOX        IDC_DX_SURFACE,181,181,105,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     RTEXT           "Resizer:",IDC_STATIC,118,200,60,8
@@ -776,11 +776,10 @@ BEGIN
     CONTROL         "Select D3D9 Render Device",IDC_D3D9DEVICE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,166,137,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,147,165,139,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Reinitialize when changing display",IDC_RESETDEVICE,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,221,171,10
-    CONTROL         "D3D Fullscreen",IDC_FULLSCREEN_MONITOR_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,210,171,10
-    CONTROL         "Alternative VSync",IDC_DSVMR9ALTERNATIVEVSYNC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,199,108,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,210,171,10
+    CONTROL         "D3D Fullscreen",IDC_FULLSCREEN_MONITOR_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,199,171,10
+    CONTROL         "Alternative VSync",IDC_DSVMR9ALTERNATIVEVSYNC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,188,108,10
     CONTROL         "VMR-9 Mixer Mode",IDC_DSVMR9LOADMIXER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,177,108,10
-    CONTROL         "YUV Mixing",IDC_DSVMR9YUVMIXER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,188,108,10
     RTEXT           "EVR Buffers:",IDC_EVR_BUFFERS_TXT,168,216,81,8
     COMBOBOX        IDC_EVR_BUFFERS,252,213,34,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "DXVA",IDC_STATIC,24,34,30,8
@@ -803,7 +802,7 @@ BEGIN
     ICON            "",IDC_QTRND_SAVEIMAGE_SUPPORT,221,75,20,20
     GROUPBOX        "Subtitle Renderer",IDC_STATIC,5,121,285,30
     COMBOBOX        IDC_COMBO1,10,133,276,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Cache compiled Shaders",IDC_CACHESHADERS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,232,171,10
+    CONTROL         "Cache compiled Shaders",IDC_CACHESHADERS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,221,171,10
 END
 
 IDD_PPAGEWEBSERVER DIALOGEX 0, 0, 296, 241
@@ -2452,16 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_DSSYSDEF            "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason. On Windown XP this is the same as VMR-7 (windowed)."
+    IDC_DSSYSDEF            "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason."
     IDC_DSOLD               "This is the default renderer of Windows 9x/me/2k. Depending on the visibility of the video window and your video card's abilities, it will switch between GDI, DirectDraw, Overlay rendering modes dynamically."
     IDC_DSOVERLAYMIXER      "Always renders in overlay. Generally only YUV formats are allowed, but they are presented directly without any color conversion to RGB. This is the fastest rendering method of all and the only where you can be sure about fullscreen video mirroring to tv-out activating."
     IDC_DSVMR9WIN           "Only available if you have DirectX 9 installed. Very stable but it will never use Overlay rendering and because of this it may be a little slower than Overlay mixer."
-    IDC_DSVMR9REN           "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. ""True Color"" desktop color space recommended. Recommended for Windows XP."
+    IDC_DSVMR9REN           "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. ""True Color"" desktop color space recommended."
     IDC_DSDXR               "Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
     IDC_DSNULL_COMP         "Connects to any video-like media type and will send the incoming samples to nowhere. Use it when you don't need the video display and want to save the CPU from working unnecessarily."
     IDC_DSNULL_UNCOMP       "Same as the normal Null renderer, but this will only connect to uncompressed types."
-    IDC_DSEVR               "Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
-    IDC_DSEVR_CUSTOM        "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended for Windows Vista or later."
+    IDC_DSEVR_CUSTOM        "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended."
 END
 
 STRINGTABLE
@@ -2517,7 +2515,6 @@ BEGIN
     IDC_TEXTURESURF3D       "Video surface will be allocated as a texture and drawn as two triangles in 3d. Antialiasing turned on at the display settings may have a bad effect on the rendering speed."
     IDC_DX9RESIZER_COMBO    "If there is no Pixel Shader 2.0 support, simple bilinear is used automatically."
     IDC_DSVMR9LOADMIXER     "Puts VMR-9 (renderless) into mixer mode, this means most of the controls on its property page will work and it will use a separate worker thread to renderer frames."
-    IDC_DSVMR9YUVMIXER      "Improves performance at the cost of some compatibility of the renderer."
 END
 
 STRINGTABLE
@@ -2637,8 +2634,8 @@ BEGIN
     IDS_AG_PNS_ROTATEZ_M    "PnS Rotate Z-"
     IDS_AG_TEARING_TEST     "Tearing Test"
     IDS_SCALE_16_9          "Scale to 16:9 TV,%.3f,%.3f,%.3f,%.3f"
-    IDS_SCALE_WIDESCREEN    "Zoom To Widescreen,%.3f,%.3f,%.3f,%.3f"
-    IDS_SCALE_ULTRAWIDE     "Zoom To Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
+    IDS_SCALE_WIDESCREEN    "Zoom to Widescreen,%.3f,%.3f,%.3f,%.3f"
+    IDS_SCALE_ULTRAWIDE     "Zoom to Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
     IDS_PLAYLIST_HIDEFS     "&Hide on Fullscreen"
 END
 
@@ -3628,15 +3625,18 @@ BEGIN
     IDS_CMD_LOCK            "/lock\t\tLock workstation after playback"
     IDS_CMD_MONITOROFF      "/monitoroff\tTurn off the monitor after playback"
     IDS_CMD_PLAYNEXT        "/playnext\t\tOpen next file in the folder after playback"
+    IDS_CMD_MUTE            "/mute\tMute the audio"
 END
 
 STRINGTABLE
 BEGIN
     IDS_CMD_FULLSCREEN      "/fullscreen\tStart in fullscreen mode"
+    IDS_CMD_VIEWPRESET      "/viewpreset N\tStart with specific preset,\n\t\twhere N is either ""1"" Minimal, ""2"" Compact or ""3"" Normal"
     IDS_CMD_MINIMIZED       "/minimized\tStart in minimized mode"
     IDS_CMD_NEW             "/new\t\tUse a new instance of the player"
     IDS_CMD_ADD             "/add\t\tAdd ""pathname"" to playlist, can be combined with /open and /play"
     IDS_CMD_RANDOMIZE       "/randomize\tRandomize the playlist"
+    IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_REGVID          "/regvid\t\tCreate file associations for video files"
     IDS_CMD_REGAUD          "/regaud\t\tCreate file associations for audio files"
     IDS_CMD_REGPL           "/regpl\t\tCreate file associations for playlist files"

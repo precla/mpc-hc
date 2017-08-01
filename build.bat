@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2016 see Authors.txt
+REM (C) 2009-2017 see Authors.txt
 REM
 REM This file is part of MPC-HC.
 REM
@@ -17,7 +17,7 @@ REM You should have received a copy of the GNU General Public License
 REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-SETLOCAL
+SETLOCAL EnableDelayedExpansion
 
 SET ARG=/%*
 SET ARG=%ARG:/=%
@@ -56,6 +56,7 @@ FOR %%G IN (%ARG%) DO (
   IF /I "%%G" == "Debug"        SET "BUILDCFG=Debug"     & SET /A ARGBC+=1 & SET "NO_INST=True"
   IF /I "%%G" == "Release"      SET "BUILDCFG=Release"   & SET /A ARGBC+=1
   IF /I "%%G" == "VS2015"       SET "COMPILER=VS2015"    & SET /A ARGCOMP+=1
+  IF /I "%%G" == "VS2017"       SET "COMPILER=VS2017"    & SET /A ARGCOMP+=1
   IF /I "%%G" == "Packages"     SET "PACKAGES=True"      & SET /A VALID+=1
   IF /I "%%G" == "Installer"    SET "INSTALLER=True"     & SET /A VALID+=1
   IF /I "%%G" == "7z"           SET "ZIP=True"           & SET /A VALID+=1
@@ -82,7 +83,7 @@ IF %ARGB%    GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGB% == 0    (SET "BUILDTY
 IF %ARGPL%   GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGPL% == 0   (SET "PPLATFORM=Both")
 IF %ARGC%    GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGC% == 0    (SET "CONFIG=MPCHC")
 IF %ARGBC%   GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGBC% == 0   (SET "BUILDCFG=Release")
-IF %ARGCOMP% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGCOMP% == 0 (SET "COMPILER=VS2015")
+IF %ARGCOMP% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGCOMP% == 0 (SET "COMPILER=VS2017")
 
 IF /I "%PACKAGES%" == "True" SET "INSTALLER=True" & SET "ZIP=True"
 
@@ -91,15 +92,25 @@ IF /I "%ZIP%" == "True"         IF "%NO_ZIP%" == "True"  GOTO UnsupportedSwitch
 IF /I "%MPCHC_LITE%" == "True"  IF "%NO_LITE%" == "True" GOTO UnsupportedSwitch
 IF /I "%CLEAN%" == "LAVFilters" IF "%NO_LAV%" == "True"  GOTO UnsupportedSwitch
 
-IF NOT DEFINED VS140COMNTOOLS GOTO MissingVar
-SET "TOOLSET=%VS140COMNTOOLS%..\..\VC\vcvarsall.bat"
-SET "BIN_DIR=bin"
+IF /I "%COMPILER%" == "VS2017" (
+  IF NOT EXIST "%MPCHC_VS_PATH%" CALL "%COMMON%" :SubVSPath
+  IF NOT EXIST "!MPCHC_VS_PATH!" GOTO MissingVar
+  SET "TOOLSET=!MPCHC_VS_PATH!\Common7\Tools\vsdevcmd"
+  SET "BIN_DIR=bin"
+) ELSE (
+  IF NOT DEFINED VS140COMNTOOLS GOTO MissingVar
+  SET "TOOLSET=%VS140COMNTOOLS%..\..\VC\vcvarsall.bat"
+  SET "BIN_DIR=bin15"
+)
+IF NOT EXIST "%TOOLSET%" GOTO MissingVar
 
 IF EXIST "%FILE_DIR%signinfo.txt" (
   IF /I "%INSTALLER%" == "True" SET "SIGN=True"
   IF /I "%ZIP%" == "True"       SET "SIGN=True"
 )
 
+REM Set version for DX libraries
+CALL "%COMMON%" :SubParseConfig
 
 :Start
 REM Check if the %LOG_DIR% folder exists otherwise MSBuild will fail
@@ -134,9 +145,12 @@ IF /I "%PPLATFORM%" == "x64" (
 IF /I "%CLEAN%" == "LAVFilters" CALL "src\thirdparty\LAVFilters\build_lavfilters.bat" Clean %PPLATFORM% %BUILDCFG% %COMPILER%
 IF %ERRORLEVEL% NEQ 0 ENDLOCAL & EXIT /B
 
-REM Always use x86_amd64 compiler, even on 64bit windows, because this is what VS is doing
-IF /I "%PPLATFORM%" == "Win32" (SET ARCH=x86) ELSE (SET ARCH=x86_amd64)
-CALL "%TOOLSET%" %ARCH%
+IF /I "%PPLATFORM%" == "Win32" (SET ARCH=x86) ELSE (SET ARCH=amd64)
+IF /I "%COMPILER%" == "VS2017" (
+  CALL "%TOOLSET%" -no_logo -arch=%ARCH% -winsdk=%MPCHC_WINSDK_VER%
+) ELSE (
+  CALL "%TOOLSET%" %ARCH% %MPCHC_WINSDK_VER%
+)
 IF %ERRORLEVEL% NEQ 0 GOTO MissingVar
 
 IF /I "%CONFIG%" == "Filters" (
@@ -321,10 +335,10 @@ EXIT /B
 :SubCopyDXDll
 IF /I "%BUILDCFG%" == "Debug" EXIT /B
 PUSHD "%BIN_DIR%"
-EXPAND "%DXSDK_DIR%\Redist\Jun2010_D3DCompiler_43_%~1.cab" -F:D3DCompiler_43.dll "mpc-hc_%~1%~2"
-IF %ERRORLEVEL% NEQ 0 CALL "%COMMON%" :SubMsg "ERROR" "Problem when extracting %DXSDK_DIR%\Redist\Jun2010_D3DCompiler_43_%~1.cab" & EXIT /B
-EXPAND "%DXSDK_DIR%\Redist\Jun2010_d3dx9_43_%~1.cab" -F:d3dx9_43.dll "mpc-hc_%~1%~2"
-IF %ERRORLEVEL% NEQ 0 CALL "%COMMON%" :SubMsg "ERROR" "Problem when extracting Jun2010_d3dx9_43_%~1.cab" & EXIT /B
+COPY /Y /V "%WindowsSdkDir%\Redist\D3D\%~1\d3dcompiler_%MPC_D3D_COMPILER_VERSION%.dll" "mpc-hc_%~1%~2" >NUL
+IF %ERRORLEVEL% NEQ 0 CALL "%COMMON%" :SubMsg "ERROR" "Problem when copying %WindowsSdkDir%\Redist\D3D\%~1\d3dcompiler_%MPC_D3D_COMPILER_VERSION%.dll" & EXIT /B
+EXPAND "%DXSDK_DIR%\Redist\Jun2010_d3dx9_%MPC_DX_SDK_NUMBER%_%~1.cab" -F:d3dx9_%MPC_DX_SDK_NUMBER%.dll "mpc-hc_%~1%~2"
+IF %ERRORLEVEL% NEQ 0 CALL "%COMMON%" :SubMsg "ERROR" "Problem when extracting Jun2010_d3dx9_%MPC_DX_SDK_NUMBER%_%~1.cab" & EXIT /B
 POPD
 EXIT /B
 
@@ -345,6 +359,9 @@ IF DEFINED MPCHC_LITE (
 
 CALL :SubCopyDXDll %MPCHC_COPY_DX_DLL_ARGS%
 
+IF /I "%COMPILER%" == "VS2015" (
+  SET MPCHC_INNO_DEF=%MPCHC_INNO_DEF% /DVS2015
+)
 CALL "%COMMON%" :SubDetectInnoSetup
 
 IF NOT DEFINED InnoSetupPath (
@@ -398,6 +415,9 @@ IF /I "%BUILDCFG%" == "Debug" (
   SET "VS_OUT_DIR=%VS_OUT_DIR%_Debug"
 )
 
+IF /I "%COMPILER%" == "VS2015" (
+  SET "PCKG_NAME=%PCKG_NAME%.%COMPILER%"
+)
 IF EXIST "%PCKG_NAME%.7z"     DEL "%PCKG_NAME%.7z"
 IF EXIST "%PCKG_NAME%.pdb.7z" DEL "%PCKG_NAME%.pdb.7z"
 IF EXIST "%PCKG_NAME%"        RD /Q /S "%PCKG_NAME%"
@@ -440,8 +460,8 @@ IF /I "%NAME%" == "MPC-HC" (
     COPY /Y /V "%VS_OUT_DIR%\%LAVFILTERSDIR%\*.dll"       "%PCKG_NAME%\%LAVFILTERSDIR%" >NUL
     COPY /Y /V "%VS_OUT_DIR%\%LAVFILTERSDIR%\*.manifest"  "%PCKG_NAME%\%LAVFILTERSDIR%" >NUL
   )
-  COPY /Y /V "%VS_OUT_DIR%\D3DCompiler_43.dll"            "%PCKG_NAME%\D3DCompiler_43.dll" >NUL
-  COPY /Y /V "%VS_OUT_DIR%\d3dx9_43.dll"                  "%PCKG_NAME%\d3dx9_43.dll" >NUL
+  COPY /Y /V "%VS_OUT_DIR%\d3dcompiler_%MPC_D3D_COMPILER_VERSION%.dll" "%PCKG_NAME%\d3dcompiler_%MPC_D3D_COMPILER_VERSION%.dll" >NUL
+  COPY /Y /V "%VS_OUT_DIR%\d3dx9_%MPC_DX_SDK_NUMBER%.dll"              "%PCKG_NAME%\d3dx9_%MPC_DX_SDK_NUMBER%.dll" >NUL
   IF NOT EXIST "%PCKG_NAME%\Shaders" MD "%PCKG_NAME%\Shaders"
   COPY /Y /V "..\src\mpc-hc\res\shaders\external\*.hlsl" "%PCKG_NAME%\Shaders" >NUL
   IF /I "%BUILDCFG%" NEQ "Debug" IF /I "%BUILDCFG%" NEQ "Debug Lite" IF EXIST "%VS_OUT_DIR%\CrashReporter\crashrpt.dll" (
@@ -477,7 +497,7 @@ EXIT /B
 TITLE %~nx0 Help
 ECHO.
 ECHO Usage:
-ECHO %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|Both] [Main^|Resources^|MPCHC^|IconLib^|Translations^|Filters^|API^|All] [Debug^|Release] [Lite] [Packages^|Installer^|7z] [LAVFilters] [VS2015] [Analyze]
+ECHO %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|Both] [Main^|Resources^|MPCHC^|IconLib^|Translations^|Filters^|API^|All] [Debug^|Release] [Lite] [Packages^|Installer^|7z] [LAVFilters] [VS2015^|VS2017] [Analyze]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
 ECHO        Debug only applies to mpc-hc.sln.
@@ -501,11 +521,10 @@ EXIT /B
 
 
 :MissingVar
-COLOR 0C
 TITLE Compiling MPC-HC %COMPILER% [ERROR]
 ECHO Not all build dependencies were found.
 ECHO.
-ECHO See "docs\Compilation.txt" for more information.
+ECHO See "docs\Compilation.md" for more information.
 CALL "%COMMON%" :SubMsg "ERROR" "Compilation failed!" & EXIT /B
 
 

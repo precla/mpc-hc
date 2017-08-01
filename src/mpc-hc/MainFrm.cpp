@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -100,6 +100,7 @@
 #include <dvdevcod.h>
 #include <dvdmedia.h>
 #include <strsafe.h>
+#include <VersionHelpersInternal.h>
 
 #include <initguid.h>
 #include <qnetwork.h>
@@ -157,6 +158,7 @@ public:
 IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
+    ON_WM_NCCREATE()
     ON_WM_CREATE()
     ON_WM_DESTROY()
     ON_WM_CLOSE()
@@ -810,13 +812,29 @@ CMainFrame::~CMainFrame()
 {
 }
 
+int CMainFrame::OnNcCreate(LPCREATESTRUCT lpCreateStruct)
+{
+    if (IsWindows10OrGreater()) {
+        // Tell Windows to automatically handle scaling of non-client areas
+        // such as the caption bar. EnableNonClientDpiScaling was introduced in Windows 10
+        const WinapiFunc<BOOL WINAPI(HWND)>
+        fnEnableNonClientDpiScaling = { _T("User32.dll"), "EnableNonClientDpiScaling" };
+
+        if (fnEnableNonClientDpiScaling) {
+            fnEnableNonClientDpiScaling(m_hWnd);
+        }
+    }
+
+    return __super::OnNcCreate(lpCreateStruct);
+}
+
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     if (__super::OnCreate(lpCreateStruct) == -1) {
         return -1;
     }
 
-    if (SysVersion::Is81OrLater()) {
+    if (IsWindows8Point1OrGreater()) {
         m_dpi.Override(m_hWnd);
     }
 
@@ -1297,9 +1315,6 @@ void CMainFrame::OnMove(int x, int y)
 {
     __super::OnMove(x, y);
 
-    //MoveVideoWindow(); // This isn't needed, based on my limited tests. If it is needed then please add a description the scenario(s) where it is needed.
-    m_wndView.Invalidate();
-
     if (m_bWasSnapped && IsZoomed()) {
         m_bWasSnapped = false;
     }
@@ -1343,7 +1358,7 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 
         CRect areaRect;
         CMonitors::GetNearestMonitor(this).GetWorkAreaRect(areaRect);
-        static const CRect invisibleBorderSize = GetInvisibleBorderSize();
+        const CRect invisibleBorderSize = GetInvisibleBorderSize();
         areaRect.InflateRect(invisibleBorderSize);
 
         bool bSnapping = false;
@@ -1494,14 +1509,13 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
     const CAppSettings& s = AfxGetAppSettings();
     if (s.iDSVideoRendererType != VIDRNDT_DS_MADVR && s.iDSVideoRendererType != VIDRNDT_DS_DXR && !s.IsD3DFullscreen()) {
         DWORD nPCIVendor = 0;
-        IDirect3D9* pD3D9 = Direct3DCreate9(D3D_SDK_VERSION);
-
-        if (pD3D9) {
+        const WinapiFunc<decltype(Direct3DCreate9)> fnDirect3DCreate9 = { _T("d3d9.dll"), "Direct3DCreate9" };
+        CComPtr<IDirect3D9> pD3D9;
+        if (fnDirect3DCreate9 && (pD3D9 = fnDirect3DCreate9(D3D_SDK_VERSION))) {
             D3DADAPTER_IDENTIFIER9 adapterIdentifier;
             if (pD3D9->GetAdapterIdentifier(GetAdapter(pD3D9, m_hWnd), 0, &adapterIdentifier) == S_OK) {
                 nPCIVendor = adapterIdentifier.VendorId;
             }
-            pD3D9->Release();
         }
 
         if (nPCIVendor == 0x8086) { // Disable ResetDevice for Intel, until can fix ...
@@ -2220,7 +2234,8 @@ void CMainFrame::DoAfterPlaybackEvent()
         SendMessage(WM_COMMAND, ID_FILE_EXIT);
     } else if (s.nCLSwitches & CLSW_SHUTDOWN) {
         SetPrivilege(SE_SHUTDOWN_NAME);
-        ExitWindowsEx(EWX_SHUTDOWN | EWX_POWEROFF | EWX_FORCEIFHUNG, 0);
+        InitiateSystemShutdownEx(nullptr, nullptr, 0, TRUE, FALSE,
+                                 SHTDN_REASON_MAJOR_APPLICATION | SHTDN_REASON_MINOR_MAINTENANCE | SHTDN_REASON_FLAG_PLANNED);
         SendMessage(WM_COMMAND, ID_FILE_EXIT);
     } else if (s.nCLSwitches & CLSW_LOGOFF) {
         SetPrivilege(SE_SHUTDOWN_NAME);
@@ -3975,10 +3990,10 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
             }
             OpenMedia(p);
         } else {
-            if (m_dwLastRun && ((GetTickCount() - m_dwLastRun) < 500)) {
+            if (m_dwLastRun && ((GetTickCount64() - m_dwLastRun) < 500ULL)) {
                 s.nCLSwitches |= CLSW_ADD;
             }
-            m_dwLastRun = GetTickCount();
+            m_dwLastRun = GetTickCount64();
 
             if ((s.nCLSwitches & CLSW_ADD) && !IsPlaylistEmpty()) {
                 m_wndPlaylistBar.Append(sl, fMulti, &s.slSubs);
@@ -4002,14 +4017,29 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
         }
     } else {
         applyRandomizeSwitch();
-        s.nCLSwitches = CLSW_NONE;
+    }
+
+    if (s.nCLSwitches & CLSW_PRESET1) {
+        SendMessage(WM_COMMAND, ID_VIEW_PRESETS_MINIMAL);
+    } else if (s.nCLSwitches & CLSW_PRESET2) {
+        SendMessage(WM_COMMAND, ID_VIEW_PRESETS_COMPACT);
+    } else if (s.nCLSwitches & CLSW_PRESET3) {
+        SendMessage(WM_COMMAND, ID_VIEW_PRESETS_NORMAL);
+    }
+    if (s.nCLSwitches & CLSW_MUTE) {
+        if (!IsMuted()) {
+            SendMessage(WM_COMMAND, ID_VOLUME_MUTE);
+        }
+    }
+    if (s.nCLSwitches & CLSW_VOLUME) {
+        m_wndToolBar.SetVolume(s.nCmdVolume);
     }
 
     if (fSetForegroundWindow && !(s.nCLSwitches & CLSW_NOFOCUS)) {
         SetForegroundWindow();
     }
 
-    s.nCLSwitches &= ~CLSW_NOFOCUS;
+    s.nCLSwitches = CLSW_NONE;
 
     return TRUE;
 }
@@ -4043,7 +4073,7 @@ void CMainFrame::OnFileOpendvd()
 
     if (s.fUseDVDPath && !s.strDVDPath.IsEmpty()) {
         path = s.strDVDPath;
-    } else if (SysVersion::IsVistaOrLater()) {
+    } else {
         CFileDialog dlg(TRUE);
         IFileOpenDialog* openDlgPtr = dlg.GetIFileOpenDialog();
 
@@ -4057,25 +4087,6 @@ void CMainFrame::OnFileOpendvd()
             openDlgPtr->Release();
 
             path = dlg.GetFolderPath();
-        }
-    } else {
-        TCHAR _path[MAX_PATH];
-
-        BROWSEINFO bi;
-        bi.hwndOwner = m_hWnd;
-        bi.pidlRoot = nullptr;
-        bi.pszDisplayName = _path;
-        bi.lpszTitle = strTitle;
-        bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_VALIDATE | BIF_USENEWUI | BIF_NONEWFOLDERBUTTON;
-        bi.lpfn = BrowseCallbackProc;
-        bi.lParam = 0;
-        bi.iImage = 0;
-
-        static PIDLIST_ABSOLUTE iil;
-        iil = SHBrowseForFolder(&bi);
-        if (iil) {
-            SHGetPathFromIDList(iil, _path);
-            path = _path;
         }
     }
 
@@ -5492,7 +5503,7 @@ void CMainFrame::OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI)
                        || s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM
                        || s.iDSVideoRendererType == VIDRNDT_DS_SYNC)
                       && r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D
-                      && (SysVersion::IsVista() || SysVersion::Is7()));
+                      && !IsWindows8OrGreater());
 
     pCmdUI->Enable(supported);
     pCmdUI->SetCheck(supported && r.m_AdvRendSets.bVMRDisableDesktopComposition);
@@ -9245,7 +9256,7 @@ CRect CMainFrame::GetInvisibleBorderSize() const
 {
     CRect invisibleBorders;
 
-    if (SysVersion::Is10OrLater()) {
+    if (IsWindows10OrGreater()) {
         static const WinapiFunc<decltype(DwmGetWindowAttribute)>
         fnDwmGetWindowAttribute = { _T("Dwmapi.dll"), "DwmGetWindowAttribute" };
 
@@ -9814,18 +9825,18 @@ void CMainFrame::MoveVideoWindow(bool fShowStats/* = false*/, bool bSetStoppedVi
             ASSERT(videoRect.Height() == lround(dScaledVRHeight));
 
             if (m_pMVRC) {
-                static const std::map<const dvstype, const LPWSTR> madVRModesMap = {
-                    { DVS_HALF,        L"50%"          },
-                    { DVS_NORMAL,      L"100%"         },
-                    { DVS_DOUBLE,      L"200%"         },
-                    { DVS_STRETCH,     L"stretch"      },
-                    { DVS_FROMINSIDE,  L"touchInside"  },
-                    { DVS_FROMOUTSIDE, L"touchOutside" },
-                    { DVS_ZOOM1,       L"touchInside"  },
-                    { DVS_ZOOM2,       L"touchInside"  }
+                static constexpr const LPWSTR madVRModesMap[] = {
+                    L"50%",
+                    L"100%",
+                    L"200%",
+                    L"stretch",
+                    L"touchInside",
+                    L"touchOutside",
+                    L"touchInside",
+                    L"touchInside"
                 };
 
-                m_pMVRC->SendCommandString("setZoomMode", madVRModesMap.at(iDefaultVideoSize));
+                m_pMVRC->SendCommandString("setZoomMode", madVRModesMap[iDefaultVideoSize]);
                 m_pMVRC->SendCommandDouble("setZoomFactorX", madVRZoomFactor * m_ZoomX);
                 m_pMVRC->SendCommandDouble("setZoomFactorY", madVRZoomFactor * m_ZoomY);
                 m_pMVRC->SendCommandDouble("setZoomOffsetX", 2 * m_PosX - 1.0);
@@ -9958,7 +9969,7 @@ CSize CMainFrame::GetZoomWindowSize(double dScale)
         if (workRect.Width() && workRect.Height()) {
             // account for invisible borders on Windows 10 by allowing
             // the window to go out of screen a bit
-            if (SysVersion::Is10OrLater()) {
+            if (IsWindows10OrGreater()) {
                 workRect.InflateRect(GetInvisibleBorderSize());
             }
 
@@ -10007,7 +10018,7 @@ CRect CMainFrame::GetZoomWindowRect(const CSize& size)
         CRect rcWork = mi.rcWork;
         // account for invisible borders on Windows 10 by allowing
         // the window to go out of screen a bit
-        if (SysVersion::Is10OrLater()) {
+        if (IsWindows10OrGreater()) {
             rcWork.InflateRect(GetInvisibleBorderSize());
         }
 
@@ -10131,7 +10142,7 @@ double CMainFrame::GetZoomAutoFitScale(bool bLargerOnly)
         decorationsSize.cy += 2 * ::GetSystemMetrics(SM_CYSIZEFRAME);
 
         // account for invisible borders on Windows 10
-        if (SysVersion::Is10OrLater()) {
+        if (IsWindows10OrGreater()) {
             RECT invisibleBorders = GetInvisibleBorderSize();
 
             decorationsSize.cx -= (invisibleBorders.left + invisibleBorders.right);
@@ -13982,11 +13993,7 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD /*= true*/)
         m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
         UpdateChapterInInfoBar();
     } else if (GetPlaybackMode() == PM_DVD && m_iDVDDomain == DVD_DOMAIN_Title) {
-        if (!SysVersion::IsVistaOrLater() && fs != State_Running) {
-            // DVD Navigator hangs on XP if we call IDvdControl2::PlayAtTime twice in paused state.
-            SendMessage(WM_COMMAND, ID_PLAY_PLAY);
-            fs = State_Running;
-        } else if (fs == State_Stopped) {
+        if (fs == State_Stopped) {
             SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
             fs = State_Paused;
         }
@@ -15874,60 +15881,29 @@ void CMainFrame::OnFileOpendirectory()
         return;
     }
 
-    const CAppSettings& s = AfxGetAppSettings();
     CString strTitle(StrRes(IDS_MAINFRM_DIR_TITLE));
     CString path;
 
-    if (SysVersion::IsVistaOrLater()) {
-        CFileDialog dlg(TRUE);
-        dlg.AddCheckButton(IDS_MAINFRM_DIR_CHECK, ResStr(IDS_MAINFRM_DIR_CHECK), TRUE);
-        IFileOpenDialog* openDlgPtr = dlg.GetIFileOpenDialog();
+    CFileDialog dlg(TRUE);
+    dlg.AddCheckButton(IDS_MAINFRM_DIR_CHECK, ResStr(IDS_MAINFRM_DIR_CHECK), TRUE);
+    IFileOpenDialog* openDlgPtr = dlg.GetIFileOpenDialog();
 
-        if (openDlgPtr != nullptr) {
-            openDlgPtr->SetTitle(strTitle);
-            openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
-            if (FAILED(openDlgPtr->Show(m_hWnd))) {
-                openDlgPtr->Release();
-                return;
-            }
+    if (openDlgPtr != nullptr) {
+        openDlgPtr->SetTitle(strTitle);
+        openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
+        if (FAILED(openDlgPtr->Show(m_hWnd))) {
             openDlgPtr->Release();
-
-            path = dlg.GetFolderPath();
-
-            BOOL recur = TRUE;
-            dlg.GetCheckButtonState(IDS_MAINFRM_DIR_CHECK, recur);
-            COpenDirHelper::m_incl_subdir = !!recur;
-        } else {
             return;
         }
+        openDlgPtr->Release();
+
+        path = dlg.GetFolderPath();
+
+        BOOL recur = TRUE;
+        dlg.GetCheckButtonState(IDS_MAINFRM_DIR_CHECK, recur);
+        COpenDirHelper::m_incl_subdir = !!recur;
     } else {
-        CString filter;
-        CAtlArray<CString> mask;
-        s.m_Formats.GetFilter(filter, mask);
-
-        COpenDirHelper::strLastOpenDir = s.strLastOpenDir;
-
-        TCHAR _path[MAX_PATH];
-        COpenDirHelper::m_incl_subdir = TRUE;
-
-        BROWSEINFO bi;
-        bi.hwndOwner      = m_hWnd;
-        bi.pidlRoot       = nullptr;
-        bi.pszDisplayName = _path;
-        bi.lpszTitle      = strTitle;
-        bi.ulFlags        = BIF_RETURNONLYFSDIRS | BIF_VALIDATE | BIF_STATUSTEXT;
-        bi.lpfn           = COpenDirHelper::BrowseCallbackProcDIR;
-        bi.lParam         = 0;
-        bi.iImage         = 0;
-
-        static PIDLIST_ABSOLUTE iil;
-        iil = SHBrowseForFolder(&bi);
-        if (iil) {
-            SHGetPathFromIDList(iil, _path);
-        } else {
-            return;
-        }
-        path = _path;
+        return;
     }
 
     // If we got a link file that points to a directory, follow the link
@@ -15954,7 +15930,7 @@ void CMainFrame::OnFileOpendirectory()
 
 HRESULT CMainFrame::CreateThumbnailToolbar()
 {
-    if (!AfxGetAppSettings().bUseEnhancedTaskBar || !SysVersion::Is7OrLater()) {
+    if (!AfxGetAppSettings().bUseEnhancedTaskBar || !IsWindows7OrGreater()) {
         return E_FAIL;
     }
 
@@ -16481,7 +16457,7 @@ bool CMainFrame::OpenBD(CString Path)
 
 #if INTERNAL_SOURCEFILTER_MPEG
     const CAppSettings& s = AfxGetAppSettings();
-    bool InternalMpegSplitter = s.SrcFilters[SRC_MPEG];
+    bool InternalMpegSplitter = s.SrcFilters[SRC_MPEG] || s.SrcFilters[SRC_MPEGTS];
 #else
     bool InternalMpegSplitter = false;
 #endif

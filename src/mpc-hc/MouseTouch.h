@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2015 see Authors.txt
+ * (C) 2013-2015, 2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -22,9 +22,9 @@
 
 #include <map>
 #include <unordered_set>
+#include <VersionHelpersInternal.h>
 
 #include "EventDispatcher.h"
-#include "SysVersion.h"
 
 // TODO: handle touch gestures
 
@@ -61,7 +61,7 @@ private:
     CMainFrame* m_pMainFrame;
     bool m_bMouseHiderStarted;
     CPoint m_mouseHiderStartScreenPoint;
-    DWORD m_dwMouseHiderStartTick;
+    ULONGLONG m_dwMouseHiderStartTick;
     bool m_bTrackingMouseLeave;
     enum class Drag { NO_DRAG, BEGIN_DRAG, DRAGGED } m_drag;
     enum class Cursor { NONE, ARROW, HAND };
@@ -219,7 +219,7 @@ class CMouseWheelHook
 
 public:
     CMouseWheelHook() {
-        if (SysVersion::Is10OrLater()) {
+        if (IsWindows10OrGreater()) {
             m_hHook = SetWindowsHookEx(WH_MOUSE, MouseProc, nullptr, GetCurrentThreadId());
             ASSERT(m_hHook);
         }
