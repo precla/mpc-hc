@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -37,6 +37,15 @@ static long revcolor(long c)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
+
+void alpha_mask_deleter::operator()(CAlphaMask* ptr) const noexcept
+{
+    m_alphaMaskPool.emplace_front(std::move(*ptr));
+    std::default_delete<CAlphaMask>()(ptr);
+    if (m_alphaMaskPool.size() > 10) {
+        m_alphaMaskPool.pop_back();
+    }
+}
 
 // CMyFont
 
@@ -786,25 +795,30 @@ CClipper::CClipper(CStringW str, const CSize& size, double scalex, double scaley
     , m_inverse(inverse)
     , m_cpOffset(cpOffset)
     , m_pAlphaMask(nullptr)
+    , m_effectType(-1)
 {
+}
+
+CAlphaMaskSharedPtr CClipper::GetAlphaMask(const std::shared_ptr<CClipper>& clipper)
+{
+    if (m_pAlphaMask) {
+        return m_pAlphaMask;
+    }
+
+    ASSERT(this == clipper.get());
     if (m_size.cx <= 0 || m_size.cy <= 0) {
-        return;
+        return nullptr;
     }
 
-    const size_t alphaMaskSize = size_t(m_size.cx) * m_size.cy;
-
-    try {
-        m_pAlphaMask = DEBUG_NEW BYTE[alphaMaskSize];
-    } catch (CMemoryException* e) {
-        e->Delete();
-        return;
+    CClipperKey key(clipper);
+    if (m_renderingCaches.alphaMaskCache.Lookup(key, m_pAlphaMask)) {
+        return m_pAlphaMask;
     }
-    memset(m_pAlphaMask, (m_inverse ? 0x40 : 0), alphaMaskSize);
 
     Paint(CPoint(0, 0), CPoint(0, 0));
 
     if (!m_pOverlayData) {
-        return;
+        return nullptr;
     }
 
     int w = m_pOverlayData->mOverlayWidth, h = m_pOverlayData->mOverlayHeight;
@@ -830,18 +844,30 @@ CClipper::CClipper(CStringW str, const CSize& size, double scalex, double scaley
     }
 
     if (w <= 0 || h <= 0) {
-        return;
+        return nullptr;
     }
 
+    const size_t alphaMaskSize = size_t(m_size.cx) * m_size.cy;
+
+    try {
+        m_pAlphaMask = CAlphaMask::Alloc(m_renderingCaches.alphaMaskPool, alphaMaskSize);
+    } catch (CMemoryException* e) {
+        e->Delete();
+        m_pAlphaMask = nullptr;
+        return nullptr;
+    }
+
+    BYTE* pAlphaMask = m_pAlphaMask->get();
+    memset(pAlphaMask, (m_inverse ? 0x40 : 0), alphaMaskSize);
+
     const BYTE* src = m_pOverlayData->mpOverlayBufferBody + m_pOverlayData->mOverlayPitch * yo + xo;
-    BYTE* dst = m_pAlphaMask + m_size.cx * y + x;
+    BYTE* dst = pAlphaMask + m_size.cx * y + x;
 
     if (m_inverse) {
         for (ptrdiff_t i = 0; i < h; ++i) {
             for (ptrdiff_t wt = 0; wt < w; ++wt) {
                 dst[wt] = 0x40 - src[wt];
             }
-
             src += m_pOverlayData->mOverlayPitch;
             dst += m_size.cx;
         }
@@ -852,11 +878,88 @@ CClipper::CClipper(CStringW str, const CSize& size, double scalex, double scaley
             dst += m_size.cx;
         }
     }
-}
 
-CClipper::~CClipper()
-{
-    SAFE_DELETE_ARRAY(m_pAlphaMask);
+    if (m_effectType == EF_SCROLL) {
+        int height = m_effect.param[4];
+        int spd_w = m_size.cx, spd_h = m_size.cy;
+        int da = (64 << 8) / height;
+        int a = 0;
+        int k = m_effect.param[0] >> 3;
+        int l = k + height;
+        if (k < 0) {
+            a += -k * da;
+            k = 0;
+        }
+        if (l > spd_h) {
+            l = spd_h;
+        }
+
+        if (k < spd_h) {
+            BYTE* am = &pAlphaMask[k * spd_w];
+
+            ZeroMemory(pAlphaMask, am - pAlphaMask);
+
+            for (ptrdiff_t j = k; j < l; j++, a += da) {
+                for (ptrdiff_t i = 0; i < spd_w; i++, am++) {
+                    *am = BYTE(((*am) * a) >> 14);
+                }
+            }
+        }
+
+        da = -(64 << 8) / height;
+        a = 0x40 << 8;
+        l = m_effect.param[1] >> 3;
+        k = l - height;
+        if (k < 0) {
+            a += -k * da;
+            k = 0;
+        }
+        if (l > spd_h) {
+            l = spd_h;
+        }
+
+        if (k < spd_h) {
+            BYTE* am = &pAlphaMask[k * spd_w];
+
+            int j = k;
+            for (; j < l; j++, a += da) {
+                for (ptrdiff_t i = 0; i < spd_w; i++, am++) {
+                    *am = BYTE(((*am) * a) >> 14);
+                }
+            }
+
+            ZeroMemory(am, (spd_h - j)*spd_w);
+        }
+    } else if (m_effectType == EF_BANNER)  {
+        int width = m_effect.param[2];
+        int spd_w = m_size.cx, spd_h = m_size.cy;
+        int da = (64 << 8) / width;
+        BYTE* am = pAlphaMask;
+
+        for (ptrdiff_t j = 0; j < spd_h; j++, am += spd_w) {
+            int a = 0;
+            int k = std::min(width, spd_w);
+
+            for (ptrdiff_t i = 0; i < k; i++, a += da) {
+                am[i] = BYTE((am[i] * a) >> 14);
+            }
+
+            a = 0x40 << 8;
+            k = spd_w - width;
+
+            if (k < 0) {
+                a -= -k * da;
+                k = 0;
+            }
+
+            for (ptrdiff_t i = k; i < spd_w; i++, a -= da) {
+                am[i] = BYTE((am[i] * a) >> 14);
+            }
+        }
+
+    }
+    m_renderingCaches.alphaMaskCache.SetAt(key, m_pAlphaMask);
+    return m_pAlphaMask;
 }
 
 CWord* CClipper::Copy()
@@ -1142,7 +1245,7 @@ void CSubtitle::Empty()
 
     EmptyEffects();
 
-    SAFE_DELETE(m_pClipper);
+    m_pClipper.reset();
 }
 
 void CSubtitle::EmptyEffects()
@@ -1312,10 +1415,7 @@ void CSubtitle::CreateClippers(CSize size)
         str.Format(L"m %d %d l %d %d %d %d %d %d", 0, 0, size.cx, 0, size.cx, size.cy, 0, size.cy);
 
         try {
-            m_pClipper = DEBUG_NEW CClipper(str, size, 1.0, 1.0, false, CPoint(0, 0), m_renderingCaches);
-            if (!m_pClipper->m_pAlphaMask) {
-                SAFE_DELETE(m_pClipper);
-            }
+            m_pClipper = std::make_shared<CClipper>(str, size, 1.0, 1.0, false, CPoint(0, 0), m_renderingCaches);
         } catch (CMemoryException* e) {
             e->Delete();
         }
@@ -1327,87 +1427,12 @@ void CSubtitle::CreateClippers(CSize size)
         if (!m_pClipper && !createClipper(size)) {
             return;
         }
-
-        int width = m_effects[EF_BANNER]->param[2];
-        int w = size.cx, h = size.cy;
-        int da = (64 << 8) / width;
-        BYTE* am = m_pClipper->m_pAlphaMask;
-
-        for (ptrdiff_t j = 0; j < h; j++, am += w) {
-            int a = 0;
-            int k = std::min(width, w);
-
-            for (ptrdiff_t i = 0; i < k; i++, a += da) {
-                am[i] = BYTE((am[i] * a) >> 14);
-            }
-
-            a = 0x40 << 8;
-            k = w - width;
-
-            if (k < 0) {
-                a -= -k * da;
-                k = 0;
-            }
-
-            for (ptrdiff_t i = k; i < w; i++, a -= da) {
-                am[i] = BYTE((am[i] * a) >> 14);
-            }
-        }
+        m_pClipper->SetEffect(*m_effects[EF_BANNER], EF_BANNER);
     } else if (m_effects[EF_SCROLL] && m_effects[EF_SCROLL]->param[4]) {
         if (!m_pClipper && !createClipper(size)) {
             return;
         }
-
-        int height = m_effects[EF_SCROLL]->param[4];
-        int w = size.cx, h = size.cy;
-        int da = (64 << 8) / height;
-        int a = 0;
-        int k = m_effects[EF_SCROLL]->param[0] >> 3;
-        int l = k + height;
-        if (k < 0) {
-            a += -k * da;
-            k = 0;
-        }
-        if (l > h) {
-            l = h;
-        }
-
-        if (k < h) {
-            BYTE* am = &m_pClipper->m_pAlphaMask[k * w];
-
-            ZeroMemory(m_pClipper->m_pAlphaMask, am - m_pClipper->m_pAlphaMask);
-
-            for (ptrdiff_t j = k; j < l; j++, a += da) {
-                for (ptrdiff_t i = 0; i < w; i++, am++) {
-                    *am = BYTE(((*am) * a) >> 14);
-                }
-            }
-        }
-
-        da = -(64 << 8) / height;
-        a = 0x40 << 8;
-        l = m_effects[EF_SCROLL]->param[1] >> 3;
-        k = l - height;
-        if (k < 0) {
-            a += -k * da;
-            k = 0;
-        }
-        if (l > h) {
-            l = h;
-        }
-
-        if (k < h) {
-            BYTE* am = &m_pClipper->m_pAlphaMask[k * w];
-
-            int j = k;
-            for (; j < l; j++, a += da) {
-                for (ptrdiff_t i = 0; i < w; i++, am++) {
-                    *am = BYTE(((*am) * a) >> 14);
-                }
-            }
-
-            ZeroMemory(am, (h - j)*w);
-        }
+        m_pClipper->SetEffect(*m_effects[EF_SCROLL], EF_SCROLL);
     }
 }
 
@@ -1839,7 +1864,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
             ;
         }
         CStringW cmd = str.Mid(jOld, j - jOld);
-        cmd.Trim();
+        FastTrim(cmd);
         if (cmd.IsEmpty()) {
             continue;
         }
@@ -1873,7 +1898,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
                 }
             }
             CStringW param = str.Mid(jOld, j - jOld);
-            param.Trim();
+            FastTrim(param);
 
             while (!param.IsEmpty()) {
                 int k = param.Find(L','), l = param.Find(L'\\');
@@ -1885,7 +1910,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
                     }
                     param = k + 1 < param.GetLength() ? param.Mid(k + 1) : L"";
                 } else {
-                    param.Trim();
+                    FastTrim(param);
                     if (!param.IsEmpty()) {
                         tag.params.Add(param);
                     }
@@ -2169,18 +2194,18 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
                 size_t nParamsInt = tag.paramsInt.GetCount();
 
                 if (nParams == 1 && nParamsInt == 0 && !sub->m_pClipper) {
-                    sub->m_pClipper = DEBUG_NEW CClipper(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3), sub->m_scalex, sub->m_scaley,
-                                                         invert, (sub->m_relativeTo == STSStyle::VIDEO) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
-                                                         m_renderingCaches);
+                    sub->m_pClipper = std::make_shared<CClipper>(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3), sub->m_scalex, sub->m_scaley,
+                                                                 invert, (sub->m_relativeTo == STSStyle::VIDEO) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
+                                                                 m_renderingCaches);
                 } else if (nParams == 1 && nParamsInt == 1 && !sub->m_pClipper) {
                     long scale = tag.paramsInt[0];
                     if (scale < 1) {
                         scale = 1;
                     }
-                    sub->m_pClipper = DEBUG_NEW CClipper(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3),
-                                                         sub->m_scalex / (1 << (scale - 1)), sub->m_scaley / (1 << (scale - 1)), invert,
-                                                         (sub->m_relativeTo == STSStyle::VIDEO) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
-                                                         m_renderingCaches);
+                    sub->m_pClipper = std::make_shared<CClipper>(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3),
+                                                                 sub->m_scalex / (1 << (scale - 1)), sub->m_scaley / (1 << (scale - 1)), invert,
+                                                                 (sub->m_relativeTo == STSStyle::VIDEO) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
+                                                                 m_renderingCaches);
                 } else if (nParamsInt == 4) {
                     sub->m_clipInverse = invert;
 
@@ -2910,16 +2935,11 @@ STDMETHODIMP_(bool) CRenderedTextSubtitle::IsAnimated(POSITION pos)
 
 struct LSub {
     int idx, layer, readorder;
-};
 
-static int lscomp(const void* ls1, const void* ls2)
-{
-    int ret = ((LSub*)ls1)->layer - ((LSub*)ls2)->layer;
-    if (!ret) {
-        ret = ((LSub*)ls1)->readorder - ((LSub*)ls2)->readorder;
+    bool operator <(const LSub& rhs) const {
+        return (layer == rhs.layer) ? readorder < rhs.readorder : layer < rhs.layer;
     }
-    return ret;
-}
+};
 
 STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox)
 {
@@ -2956,14 +2976,12 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
     CAtlArray<LSub> subs;
 
     for (ptrdiff_t i = 0, j = stss->subs.GetCount(); i < j; i++) {
-        LSub ls;
-        ls.idx = stss->subs[i];
-        ls.layer = GetAt(stss->subs[i]).layer;
-        ls.readorder = GetAt(stss->subs[i]).readorder;
-        subs.Add(ls);
+        const auto idx = stss->subs[i];
+        const auto& sts_entry = GetAt(idx);
+        subs.Add({ idx, sts_entry.layer, sts_entry.readorder });
     }
 
-    qsort(subs.GetData(), subs.GetCount(), sizeof(LSub), lscomp);
+    std::sort(subs.GetData(), subs.GetData() + subs.GetCount());
 
     for (ptrdiff_t i = 0, j = subs.GetCount(); i < j; i++) {
         int entry = subs[i].idx;
@@ -2993,7 +3011,14 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 
         CPoint org2;
 
-        BYTE* pAlphaMask = s->m_pClipper ? s->m_pClipper->m_pAlphaMask : nullptr;
+        BYTE* pAlphaMask = nullptr;
+
+        if (s->m_pClipper) {
+            const auto& ptr = s->m_pClipper->GetAlphaMask(s->m_pClipper);
+            if (ptr) {
+                pAlphaMask = ptr->get();
+            }
+        }
 
         for (int k = 0; k < EF_NUMBEROFEFFECTS; k++) {
             if (!s->m_effects[k]) {

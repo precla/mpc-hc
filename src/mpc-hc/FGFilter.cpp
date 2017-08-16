@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -270,10 +270,11 @@ HRESULT CFGFilterRegistry::Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &
 };
 
 interface __declspec(uuid("97f7c4d4-547b-4a5f-8332-536430ad2e4d"))
-IAMFilterData :
-public IUnknown {
-    STDMETHOD(ParseFilterData)(BYTE * rgbFilterData, ULONG cb, BYTE** prgbRegFilter2) PURE;
-    STDMETHOD(CreateFilterData)(REGFILTER2 * prf2, BYTE** prgbFilterData, ULONG * pcb) PURE;
+    IAMFilterData :
+    public IUnknown
+{
+    STDMETHOD(ParseFilterData)(BYTE* rgbFilterData, ULONG cb, BYTE** prgbRegFilter2) PURE;
+    STDMETHOD(CreateFilterData)(REGFILTER2* prf2, BYTE** prgbFilterData, ULONG* pcb) PURE;
 };
 
 void CFGFilterRegistry::ExtractFilterData(BYTE* p, UINT len)
@@ -604,7 +605,7 @@ POSITION CFGFilterList::GetHeadPosition()
         for (int i = 0; pos; i++) {
             sort[i] = m_filters.GetNext(pos);
         }
-        qsort(&sort[0], sort.GetCount(), sizeof(sort[0]), filter_cmp);
+        std::sort(sort.GetData(), sort.GetData() + sort.GetCount());
         for (size_t i = 0; i < sort.GetCount(); i++) {
             if (sort[i].pFGF->GetMerit() >= MERIT64_DO_USE) {
                 m_sortedfilters.AddTail(sort[i].pFGF);
@@ -628,52 +629,4 @@ POSITION CFGFilterList::GetHeadPosition()
 CFGFilter* CFGFilterList::GetNext(POSITION& pos)
 {
     return m_sortedfilters.GetNext(pos);
-}
-
-int CFGFilterList::filter_cmp(const void* a, const void* b)
-{
-    filter_t* fa = (filter_t*)a;
-    filter_t* fb = (filter_t*)b;
-
-    if (fa->group < fb->group) {
-        return -1;
-    }
-    if (fa->group > fb->group) {
-        return +1;
-    }
-
-    if (fa->pFGF->GetMerit() > fb->pFGF->GetMerit()) {
-        return -1;
-    }
-    if (fa->pFGF->GetMerit() < fb->pFGF->GetMerit()) {
-        return +1;
-    }
-
-    if (fa->pFGF->GetCLSID() == fb->pFGF->GetCLSID()) {
-        CFGFilterFile* fgfa = dynamic_cast<CFGFilterFile*>(fa->pFGF);
-        CFGFilterFile* fgfb = dynamic_cast<CFGFilterFile*>(fb->pFGF);
-
-        if (fgfa && !fgfb) {
-            return -1;
-        }
-        if (!fgfa && fgfb) {
-            return +1;
-        }
-    }
-
-    if (fa->exactmatch && !fb->exactmatch) {
-        return -1;
-    }
-    if (!fa->exactmatch && fb->exactmatch) {
-        return +1;
-    }
-
-    if (fa->index < fb->index) {
-        return -1;
-    }
-    if (fa->index > fb->index) {
-        return +1;
-    }
-
-    return 0;
 }

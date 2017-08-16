@@ -1290,7 +1290,7 @@ static bool LoadFont(const CString& font)
     HANDLE hFont = INVALID_HANDLE_VALUE;
 
     if (HMODULE hModule = LoadLibrary(_T("gdi32.dll"))) {
-        typedef HANDLE(WINAPI * PAddFontMemResourceEx)(IN PVOID, IN DWORD, IN PVOID , IN DWORD*);
+        typedef HANDLE(WINAPI * PAddFontMemResourceEx)(IN PVOID, IN DWORD, IN PVOID, IN DWORD*);
         if (PAddFontMemResourceEx f = (PAddFontMemResourceEx)GetProcAddress(hModule, "AddFontMemResourceEx")) {
             DWORD cFonts;
             hFont = f(pData, datalen, nullptr, &cFonts);
@@ -2520,26 +2520,25 @@ void CSimpleTextSubtitle::SetStr(int i, CStringW str, bool fUnicode)
     }
 }
 
-static int comp1(const void* a, const void* b)
+static inline bool comp1(const STSEntry& lhs, const STSEntry& rhs)
 {
-    int ret = SGN(((STSEntry*)a)->start - ((STSEntry*)b)->start);
-    if (ret == 0) {
-        ret = ((STSEntry*)a)->layer - ((STSEntry*)b)->layer;
+    if (lhs.start != rhs.start) {
+        return lhs.start < rhs.start;
     }
-    if (ret == 0) {
-        ret = ((STSEntry*)a)->readorder - ((STSEntry*)b)->readorder;
+    if (lhs.layer != rhs.layer) {
+        return lhs.layer < rhs.layer;
     }
-    return ret;
+    return lhs.readorder < rhs.readorder;
 }
 
-static int comp2(const void* a, const void* b)
+static inline bool comp2(const STSEntry& lhs, const STSEntry& rhs)
 {
-    return (((STSEntry*)a)->readorder - ((STSEntry*)b)->readorder);
+    return lhs.readorder < rhs.readorder;
 }
 
 void CSimpleTextSubtitle::Sort(bool fRestoreReadorder)
 {
-    qsort(GetData(), GetCount(), sizeof(STSEntry), !fRestoreReadorder ? comp1 : comp2);
+    std::sort(GetData(), GetData() + GetCount(), !fRestoreReadorder ? comp1 : comp2);
     CreateSegments();
 }
 

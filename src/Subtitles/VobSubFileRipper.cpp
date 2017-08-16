@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -238,7 +238,7 @@ bool CVobSubFileRipper::LoadIfo(CString fn)
 
                 pgc.pal[j].rgbRed = std::min<BYTE>(std::max<BYTE>(BYTE(1.0 * y + 1.4022 * (u - 128)), 0u), 255u);
                 pgc.pal[j].rgbGreen = std::min<BYTE>(std::max<BYTE>(BYTE(1.0 * y - 0.3456 * (u - 128) - 0.7145 * (v - 128)), 0u), 255u);
-                pgc.pal[j].rgbBlue = std::min<BYTE>(std::max<BYTE>(BYTE(1.0 * y + 1.7710 * (v - 128)), 0u) , 255u);
+                pgc.pal[j].rgbBlue = std::min<BYTE>(std::max<BYTE>(BYTE(1.0 * y + 1.7710 * (v - 128)), 0u), 255u);
             }
 
             //
@@ -453,11 +453,6 @@ DWORD CVobSubFileRipper::ThreadProc()
     }
     UNREACHABLE_CODE(); // we should only exit via CMD_EXIT
 #pragma warning(pop)
-}
-
-static int SubPosSortProc(const void* e1, const void* e2)
-{
-    return ((int)(((CVobSubFile::SubPos*)e1)->start - ((CVobSubFile::SubPos*)e2)->start));
 }
 
 bool CVobSubFileRipper::Create()
@@ -777,7 +772,7 @@ bool CVobSubFileRipper::Create()
         m_langs[i].name = m_langs[i].alt = FindLangFromId(m_langs[i].id);
 
         CAtlArray<SubPos>& sp = m_langs[i].subpos;
-        qsort(sp.GetData(), sp.GetCount(), sizeof(SubPos), SubPosSortProc);
+        std::sort(sp.GetData(), sp.GetData() + sp.GetCount());
 
         if (m_rd.bForcedOnly) {
             Log(LOG_INFO, _T("Searching for forced subs..."));
