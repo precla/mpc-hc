@@ -274,7 +274,7 @@ void CBaseAP::AdjustQuad(MYD3DVERTEX<texcoords>* v, double dx, double dy)
             v[i].t[j].v -= (float)(offset * dy);
         }
 
-        if (texcoords > 1) {
+        if constexpr (texcoords > 1) {
             v[i].t[texcoords - 1].u -= offset;
             v[i].t[texcoords - 1].v -= offset;
         }
@@ -659,7 +659,7 @@ HRESULT CBaseAP::CreateDXDevice(CString& _Error)
     }
 
     if (FAILED(hr)) {
-        _Error.AppendFormat(_T("CreateDevice failed: %s\n"), GetWindowsErrorMessage(hr, m_hD3D9));
+        _Error.AppendFormat(_T("CreateDevice failed: %s\n"), GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 
         return hr;
     }
@@ -2985,7 +2985,7 @@ HRESULT CSyncAP::CreateOptimalOutputType(IMFMediaType* pMixerProposedType, IMFMe
 
     for (REFGUID guidKey : colorAttributes) {
         if (FAILED(hr = copyAttribute(pMixerInputType, pOptimalMediaType, guidKey))) {
-            TRACE(_T("Copying color attribute %s failed: 0x%08x\n"), CComBSTR(guidKey), hr);
+            TRACE(_T("Copying color attribute %s failed: 0x%08x\n"), static_cast<LPCTSTR>(CComBSTR(guidKey)), hr);
         }
     }
 
@@ -3074,7 +3074,7 @@ HRESULT CSyncAP::SetMediaType(IMFMediaType* pType)
 
         strTemp = GetMediaTypeName(pAMMedia->subtype);
         strTemp.Replace(L"MEDIASUBTYPE_", L"");
-        m_strStatsMsg[MSG_MIXEROUT].Format(L"Mixer output : %s", strTemp);
+        m_strStatsMsg[MSG_MIXEROUT].Format(L"Mixer output : %s", strTemp.GetString());
     }
 
     pType->FreeRepresentation(FORMAT_VideoInfo2, (void*)pAMMedia);

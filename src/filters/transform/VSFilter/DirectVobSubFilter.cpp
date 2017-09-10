@@ -518,7 +518,7 @@ HRESULT CDirectVobSubFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tS
 
 REFERENCE_TIME CDirectVobSubFilter::CalcCurrentTime()
 {
-    REFERENCE_TIME rt = m_pSubClock ? m_pSubClock->GetTime() : m_tPrev;
+    REFERENCE_TIME rt = m_pSubClock ? m_pSubClock->GetTime() : static_cast<REFERENCE_TIME>(m_tPrev);
     return (rt - 10000i64 * m_SubtitleDelay) * m_SubtitleSpeedNormalizedMul / m_SubtitleSpeedNormalizedDiv; // no, it won't overflow if we use normal parameters (__int64 is enough for about 2000 hours if we multiply it by the max: 65536 as m_SubtitleSpeedMul)
 }
 
@@ -1352,7 +1352,7 @@ HRESULT CDirectVobSubFilter2::CheckInputType(const CMediaType* mtIn)
 bool CDirectVobSubFilter2::IsAppBlackListed()
 {
     // all entries must be lowercase!
-    TCHAR* blacklistedapps[] = {
+    constexpr LPCTSTR blacklistedapps[] = {
         _T("wm8eutil."),        // wmp8 encoder's dummy renderer releases the outputted media sample after calling Receive on its input pin (yes, even when dvobsub isn't registered at all)
         _T("explorer."),        // as some users reported thumbnail preview loads dvobsub, I've never experienced this yet...
         _T("producer."),        // this is real's producer

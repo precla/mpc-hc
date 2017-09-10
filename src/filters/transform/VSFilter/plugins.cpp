@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014, 2016 see Authors.txt
+ * (C) 2006-2014, 2016-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -298,13 +298,13 @@ namespace Plugin
             }
 
             void StringProc(const FilterActivation* fa, const FilterFunctions* ff, char* str) {
-                sprintf_s(str, STRING_PROC_BUFFER_SIZE, " (%s)", GetFileName().IsEmpty() ? " (empty)" : CStringA(GetFileName()));
+                sprintf_s(str, STRING_PROC_BUFFER_SIZE, " (%s)", GetFileName().IsEmpty() ? " (empty)" : CStringA(GetFileName()).GetString());
             }
 
             bool FssProc(FilterActivation* fa, const FilterFunctions* ff, char* buf, int buflen) {
                 CStringA fn(GetFileName());
                 fn.Replace("\\", "\\\\");
-                _snprintf_s(buf, buflen, buflen, "Config(\"%s\")", fn);
+                _snprintf_s(buf, buflen, buflen, "Config(\"%s\")", fn.GetString());
                 return true;
             }
         };
@@ -337,7 +337,7 @@ namespace Plugin
 
             void StringProc(const FilterActivation* fa, const FilterFunctions* ff, char* str) {
                 if (!GetFileName().IsEmpty()) {
-                    sprintf_s(str, STRING_PROC_BUFFER_SIZE, " (%s, %d)", CStringA(GetFileName()), GetCharSet());
+                    sprintf_s(str, STRING_PROC_BUFFER_SIZE, " (%s, %d)", CStringA(GetFileName()).GetString(), GetCharSet());
                 } else {
                     sprintf_s(str, STRING_PROC_BUFFER_SIZE, " (empty)");
                 }
@@ -346,7 +346,7 @@ namespace Plugin
             bool FssProc(FilterActivation* fa, const FilterFunctions* ff, char* buf, int buflen) {
                 CStringA fn(GetFileName());
                 fn.Replace("\\", "\\\\");
-                _snprintf_s(buf, buflen, buflen, "Config(\"%s\", %d)", fn, GetCharSet());
+                _snprintf_s(buf, buflen, buflen, "Config(\"%s\", %d)", fn.GetString(), GetCharSet());
                 return true;
             }
         };
@@ -424,7 +424,7 @@ namespace Plugin
         }
 
         ScriptFunctionDef vobsub_func_defs[] = {
-            { (ScriptFunctionPtr)vobsubScriptConfig, "Config", "0s" },
+            { (ScriptFunctionPtr)vobsubScriptConfig, const_cast<char*>("Config"), const_cast<char*>("0s") },
             { nullptr },
         };
 
@@ -452,7 +452,7 @@ namespace Plugin
         };
 
         ScriptFunctionDef textsub_func_defs[] = {
-            { (ScriptFunctionPtr)textsubScriptConfig, "Config", "0si" },
+            { (ScriptFunctionPtr)textsubScriptConfig, const_cast<char*>("Config"), const_cast<char*>("0si") },
             { nullptr },
         };
 
@@ -524,7 +524,7 @@ namespace Plugin
                 dst.w = fa->src.w;
                 dst.h = fa->src.h;
                 dst.bpp = 32;
-                dst.pitch = fa->src.pitch;
+                dst.pitch = int(fa->src.pitch);
                 dst.bits = (BYTE*)fa->src.data;
 
                 Render(dst, 10000i64 * fa->pfsi->lSourceFrameMS, 1000.0f / fa->pfsi->lMicrosecsPerFrame);
@@ -565,7 +565,7 @@ namespace Plugin
             }
 
             void StringProc(const VDXFilterActivation* fa, const VDXFilterFunctions* ff, char* str) {
-                sprintf_s(str, STRING_PROC_BUFFER_SIZE, " (%s)", GetFileName().IsEmpty() ? " (empty)" : CStringA(GetFileName()));
+                sprintf_s(str, STRING_PROC_BUFFER_SIZE, " (%s)", GetFileName().IsEmpty() ? " (empty)" : CStringA(GetFileName()).GetString());
             }
 
             bool FssProc(VDXFilterActivation* fa, const VDXFilterFunctions* ff, char* buf, int buflen) {

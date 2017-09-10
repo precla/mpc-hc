@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2014, 2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -42,7 +42,7 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 };
 
 const AMOVIESETUP_PIN sudOpPin[] = {
-    {L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut},
+    {const_cast<LPWSTR>(L"Output"), FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut},
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
@@ -510,9 +510,9 @@ HRESULT CSubtitleStream::FillBuffer(IMediaSample* pSample)
             } else if (m_mt.majortype == MEDIATYPE_Subtitle && (m_mt.subtype == MEDIASUBTYPE_SSA || m_mt.subtype == MEDIASUBTYPE_ASS)) {
                 CStringW line;
                 line.Format(L"%d,%d,%s,%s,%d,%d,%d,%s,%s",
-                            stse.readorder, stse.layer, CStringW(stse.style), CStringW(stse.actor),
+                            stse.readorder, stse.layer, stse.style.GetString(), stse.actor.GetString(),
                             stse.marginRect.left, stse.marginRect.right, (stse.marginRect.top + stse.marginRect.bottom) / 2,
-                            CStringW(stse.effect), m_rts.GetStrW(m_nPosition, true));
+                            stse.effect.GetString(), m_rts.GetStrW(m_nPosition, true).GetString());
 
                 CStringA str = UTF16To8(line);
                 memcpy((char*)pData, str, len = str.GetLength());

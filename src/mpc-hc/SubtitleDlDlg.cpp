@@ -584,7 +584,7 @@ afx_msg LRESULT CSubtitleDlDlg::OnDownloading(WPARAM /*wParam*/, LPARAM lParam)
     SubtitlesInfo& _fileInfo = *(SubtitlesInfo*)lParam;
 
     CString statusMessage;
-    statusMessage.Format(IDS_SUBDL_DLG_DOWNLOADING, CString(_fileInfo.Provider()->Name().c_str()), CString(_fileInfo.fileName.c_str()));
+    statusMessage.Format(IDS_SUBDL_DLG_DOWNLOADING, CString(_fileInfo.Provider()->Name().c_str()).GetString(), CString(_fileInfo.fileName.c_str()).GetString());
     SetStatusText(statusMessage);
 
     return S_OK;
@@ -595,7 +595,7 @@ afx_msg LRESULT CSubtitleDlDlg::OnDownloaded(WPARAM /*wParam*/, LPARAM lParam)
     SubtitlesInfo& _fileInfo = *(SubtitlesInfo*)lParam;
 
     CString statusMessage;
-    statusMessage.Format(IDS_SUBDL_DLG_DOWNLOADED, CString(_fileInfo.Provider()->Name().c_str()), CString(_fileInfo.fileName.c_str()));
+    statusMessage.Format(IDS_SUBDL_DLG_DOWNLOADED, CString(_fileInfo.Provider()->Name().c_str()).GetString(), CString(_fileInfo.fileName.c_str()).GetString());
     SetStatusText(statusMessage);
 
     for (int i = 0; i < m_list.GetItemCount(); ++i) {
@@ -628,7 +628,7 @@ afx_msg LRESULT CSubtitleDlDlg::OnCompleted(WPARAM wParam, LPARAM lParam)
             CString disc;
             disc.Format(_T("%d/%d"), subInfo.discNumber, subInfo.discCount);
             m_list.SetItemText(iItem, COL_DISC, disc);
-            m_list.SetItemText(iItem, COL_HEARINGIMPAIRED, subInfo.hearingImpaired == -1 ? _T("-") : subInfo.hearingImpaired > 0 ? ResStr(IDS_YES) : ResStr(IDS_NO));
+            m_list.SetItemText(iItem, COL_HEARINGIMPAIRED, subInfo.hearingImpaired == -1 ? _T("-") : subInfo.hearingImpaired > 0 ? ResStr(IDS_YES).GetString() : ResStr(IDS_NO).GetString());
             CString downloads(_T("-"));
             if (subInfo.downloadCount != -1) {
                 downloads.Format(_T("%d"), subInfo.downloadCount);

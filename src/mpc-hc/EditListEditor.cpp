@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2014, 2016 see Authors.txt
+ * (C) 2009-2014, 2016-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -62,12 +62,12 @@ void CClip::SetOut(REFERENCE_TIME rtVal)
 
 CString CClip::GetIn() const
 {
-    return (m_rtIn == _I64_MIN) ? _T("") : ReftimeToString(m_rtIn);
+    return m_rtIn == _I64_MIN ? CString() : ReftimeToString(m_rtIn);
 }
 
 CString CClip::GetOut() const
 {
-    return (m_rtOut == _I64_MIN) ? _T("") : ReftimeToString(m_rtOut);
+    return m_rtOut == _I64_MIN ? CString() : ReftimeToString(m_rtOut);
 }
 
 IMPLEMENT_DYNAMIC(CEditListEditor, CPlayerBar)
@@ -186,7 +186,7 @@ void CEditListEditor::SaveEditListToFile()
                 CClip&  CurClip = m_editList.GetAt(pos);
 
                 if (CurClip.HaveIn() && CurClip.HaveOut()) {
-                    strLine.Format(_T("%s\t%s\t%s\t%s\t%s\n"), CurClip.GetIn(), CurClip.GetOut(), CurClip.GetName(), strUser, strHotFolders);
+                    strLine.Format(_T("%s\t%s\t%s\t%s\t%s\n"), CurClip.GetIn().GetString(), CurClip.GetOut().GetString(), CurClip.GetName().GetString(), strUser.GetString(), strHotFolders.GetString());
                     editListFile.WriteString(strLine);
                 }
             }
@@ -320,7 +320,7 @@ POSITION CEditListEditor::InsertClip(POSITION pos, CClip& newClip)
     lv.mask = LVIF_STATE | LVIF_TEXT;
     lv.iItem = FindIndex(pos);
     lv.iSubItem = 0;
-    lv.pszText = _T("");
+    lv.pszText = const_cast<LPTSTR>(_T(""));
     lv.state = m_list.GetItemCount() == 0 ? LVIS_SELECTED : 0;
     m_list.InsertItem(&lv);
 
